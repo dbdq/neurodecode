@@ -666,8 +666,14 @@ def raw_crop(raw, tmin, tmax):
 
 
 def load_config(cfg_module):
+    cfg_module = cfg_module.replace('\\', '/')
     if '/' in cfg_module:
-        cfg_module = cfg_module.replace('/', '.').replace('.py', '')
-        logger.warning('Replacing deprecated config path to new style: %s' % cfg_module)
-        logger.warning('Please change your argument.')
-    return importlib.import_module(cfg_module)
+        pp = qc.parse_path(cfg_module)
+        cwd = os.getcwd()
+        os.chdir(pp.dir)
+        cfg = importlib.import_module(pp.name)
+        os.chdir(cwd)
+    else:
+        cfg = importlib.import_module(cfg_module)
+    logger.info('Loaded config %s' % cfg_module)
+    return cfg

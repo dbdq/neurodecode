@@ -50,19 +50,19 @@ from pycnbi.stream_viewer.ui_mainwindow_Viewer import Ui_MainWindow
 path2_viewerFolder = Path(os.environ['PYCNBI_ROOT'])/'pycnbi'/'stream_viewer'
 
 class Scope(QMainWindow):
-    def __init__(self, amp_name, amp_serial, state=mp.Value('i', 1), queue=None):        
+    def __init__(self, amp_name, amp_serial, state=mp.Value('i', 1), queue=None):
         super(Scope, self).__init__()
 
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+
         redirect_stdout_to_queue(logger, queue, 'INFO')
         logger.info('Viewer launched')
-        
+
         self.amp_name = amp_name
         self.amp_serial = amp_serial
         self.state = state
-        
+
         self.init_scope()
 
     #
@@ -304,6 +304,14 @@ class Scope(QMainWindow):
             self.ui.doubleSpinBox_lp.setValue(float(
                 self.scope_settings.get("filtering",
                     "bandpass_cutoff_frequency").split(' ')[1]))
+            self.ui.doubleSpinBox_lp.setMinimum(0.1)
+            self.ui.doubleSpinBox_lp.setMaximum(self.sr.sample_rate/2 - 0.1)
+            self.ui.doubleSpinBox_lp.setDecimals(1)
+            self.ui.doubleSpinBox_lp.setSingleStep(1)
+            self.ui.doubleSpinBox_hp.setMinimum(0.1)
+            self.ui.doubleSpinBox_hp.setMaximum(self.sr.sample_rate/2 - 0.1)
+            self.ui.doubleSpinBox_hp.setDecimals(1)
+            self.ui.doubleSpinBox_hp.setSingleStep(1)
             self.ui.pushButton_bp.click()
 
         self.ui.checkBox_bandpass.setChecked(self.apply_car)
@@ -411,12 +419,12 @@ class Scope(QMainWindow):
     #	Main update function (connected to the timer)
     #
     def update_loop(self):
-        
+
         #  Sharing variable to stop at the GUI level
         if not self.state.value:
             logger.info('Viewer stopped')
             sys.exit()
-            
+
         try:
             # assert self.updating==False, 'thread destroyed?'
             # self.updating= True
@@ -448,7 +456,7 @@ class Scope(QMainWindow):
         try:
             # data, self.ts_list= self.sr.inlets[0].pull_chunk(max_samples=self.config['sf']) # [frames][channels]
             data, self.ts_list = self.sr.acquire(blocking=False)
-            
+
             # TODO: check and change to these two lines
             #self.sr.acquire(blocking=False, decim=DECIM)
             #data, self.ts_list = self.sr.get_window()

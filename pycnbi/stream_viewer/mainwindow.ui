@@ -164,15 +164,6 @@
       <height>27</height>
      </rect>
     </property>
-    <property name="minimum">
-     <double>0.100000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.100000000000000</double>
-    </property>
-    <property name="value">
-     <double>1.000000000000000</double>
-    </property>
    </widget>
    <widget class="QDoubleSpinBox" name="doubleSpinBox_lp">
     <property name="geometry">
@@ -182,15 +173,6 @@
       <width>69</width>
       <height>27</height>
      </rect>
-    </property>
-    <property name="minimum">
-     <double>1.000000000000000</double>
-    </property>
-    <property name="singleStep">
-     <double>0.100000000000000</double>
-    </property>
-    <property name="value">
-     <double>50.000000000000000</double>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox_showTID">

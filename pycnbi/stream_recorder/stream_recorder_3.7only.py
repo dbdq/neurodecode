@@ -148,8 +148,7 @@ def run_gui(recordState, protocolState, record_dir, recordLogger=logger, amp_nam
 
     # spawn the recorder as a child process
     recordLogger.info('\n>> Recording started.')
-    #proc = mp.Process(target=record, args=[recordState, amp_name, amp_serial, record_dir, eeg_only, recordLogger, queue])
-    proc = mp.Process(target=record, args=[recordState, amp_name, amp_serial, record_dir, eeg_only])
+    proc = mp.Process(target=record, args=[recordState, amp_name, amp_serial, record_dir, eeg_only, recordLogger , queue])
     proc.start()
 
     # Launching the protocol (shared variable)

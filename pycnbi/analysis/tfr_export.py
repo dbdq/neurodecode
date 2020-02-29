@@ -21,6 +21,7 @@ import mne.time_frequency
 import matplotlib.pyplot as plt
 import pycnbi.utils.pycnbi_utils as pu
 import pycnbi.utils.q_common as qc
+from pycnbi.triggers.trigger_def import trigger_def
 from pycnbi import logger
 from builtins import input
 from scipy.signal import lfilter
@@ -138,13 +139,17 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
 
     # Read epochs
     classes = {}
-    for t in cfg.TRIGGERS:
-        if t in set(events[:, -1]):
-            if hasattr(cfg, 'tdef'):
-                classes[cfg.tdef.by_value[t]] = t
-            else:
-                classes[str(t)] = t
+    event_set = set(events[:, -1])
+    for t_name in cfg.TRIGGER_DEF:
+        if cfg.TRIGGER_FILE is not None:
+            tdef = trigger_def(cfg.TRIGGER_FILE)
+            t_value = tdef.by_name[t_name]
+            if t_value in event_set:
+                classes[t_name] = t_value
+        else:
+            classes[str(t_name)] = t_name
     if len(classes) == 0:
+        from IPython import embed; embed()
         raise ValueError('No desired event was found from the data.')
 
     try:
@@ -275,20 +280,14 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
             plt.close()
     logger.info('Finished !')
 
-def load_config(cfg_file):
-    cfg_file = qc.forward_slashify(cfg_file)
-    if not (os.path.exists(cfg_file) and os.path.isfile(cfg_file)):
-        raise IOError('%s cannot be loaded.' % os.path.realpath(cfg_file))
-    return imp.load_source(cfg_file, cfg_file)
-
-def batch_run(cfg_file):
-    cfg = load_config(cfg_file)
+def batch_run(cfg_module):
+    cfg = pu.load_config(cfg_module)
     cfg = check_config(cfg)
     get_tfr(cfg)
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        cfg_file = input('Config file name? ')
+        cfg_module = input('Config module name? ')
     else:
-        cfg_file = sys.argv[1]
-    batch_run(cfg_file)
+        cfg_module = sys.argv[1]
+    batch_run(cfg_module)

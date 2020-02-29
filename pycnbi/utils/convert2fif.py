@@ -488,9 +488,13 @@ def any2fif(filename, interactive=False, outdir=None, channel_file=None):
         eve_file = '%s/%s.txt' % (p.dir, p.name.replace('raw', 'eve'))
         if os.path.exists(eve_file):
             logger.info('Adding events from %s' % eve_file)
+            eveoffset_file = qc.parse_path(eve_file).name + '-offset.txt'
+            if os.path.exists(eveoffset_file):
+                offset = float(open(eveoffset_file).readline().split('Offset: ')[-1].strip())
+                logger.info('Adding event offset %.1f from %s' % (offset, eve_file))
         else:
             eve_file = None
-        pcl2fif(filename, interactive=interactive, outdir=outdir, external_event=eve_file)
+        pcl2fif(filename, interactive=interactive, outdir=outdir, external_event=eve_file, offset=offset)
     elif p.ext == 'eeg':
         eeg2fif(filename, interactive=interactive, outdir=outdir)
     elif p.ext in ['edf', 'bdf']:

@@ -16,9 +16,10 @@ import time
 import pylsl
 import ctypes
 import threading
+import multiprocessing as mp
+import pycnbi.utils.q_common as qc
 import pycnbi.utils.cnbi_lsl as cnbi_lsl
 import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.utils.q_common as qc
 from pycnbi import logger
 from builtins import input, bytes
 
@@ -47,6 +48,8 @@ class Trigger(object):
     I've made a C++ library to send commands to LPTx using standard Windows API.
     Use LptControl64.dll for 64 bit Python and LptControl32.dll for 32 bit Python.
 
+    state = multiprocessing.value 1: acquire, 0:stop
+
     Some important functions:
     int init(duration)
         Returns False if error, True if success.
@@ -56,7 +59,7 @@ class Trigger(object):
         Sends the value to the parallel port and sets to 0 after a set period.
         The value shuold be an integer in the range of 0-255.
     """
-    def __init__(self, lpttype='USB2LPT', portaddr=None, verbose=True, check_lsl_offset=False):
+    def __init__(self, lpttype='USB2LPT', portaddr=None, verbose=True, check_lsl_offset=True, state=mp.Value('i', 1)):
         self.evefile = None
         self.lpttype = lpttype
         self.verbose = verbose
@@ -125,7 +128,7 @@ class Trigger(object):
 
             # get data file location
             LSL_SERVER = 'StreamRecorderInfo'
-            inlet = cnbi_lsl.start_client(LSL_SERVER)
+            inlet = cnbi_lsl.start_client(LSL_SERVER, state)
             evefile = inlet.info().source_id()
             eveoffset_file = evefile[:-4] + '-offset.txt'
             logger.info('Event file is: %s' % evefile)
@@ -133,14 +136,16 @@ class Trigger(object):
 
             if check_lsl_offset:
                 # check server LSL time server integrity
-                logger.info("Checking LSL server's timestamp integrity for logging software triggers.")
+                qc.print_c('>> Please choose amplifier server to check the timestamp offset:', 'G')
                 amp_name, amp_serial = pu.search_lsl()
                 sr = StreamReceiver(window_size=1, buffer_size=1, amp_serial=amp_serial, eeg_only=False, amp_name=amp_name)
                 local_time = pylsl.local_clock()
                 server_time = sr.get_window_list()[1][-1]
-                lsl_time_offset = local_time - server_time
+                lsl_time_offset = server_time - local_time
                 with open(eveoffset_file, 'a') as f:
-                    f.write('Local time: %.6f, Server time: %.6f, Offset: %.6f\n' % (local_time, server_time, lsl_time_offset))
+                    f.write('Offset: %.6f\n' % lsl_time_offset)
+                    f.write('Server time: %.6f\n' % server_time)
+                    f.write('Local time: %.6f\n' % local_time)
                 logger.info('LSL timestamp offset (%.3f) saved to %s' % (lsl_time_offset, eveoffset_file))
 
         elif self.lpttype == 'FAKE' or self.lpttype is None or self.lpttype is False:
@@ -279,7 +284,7 @@ def test_all_bits(trigger):
 # sample test code
 if __name__ == '__main__':
     #trigger = Trigger('COM3') # Arduino trigger
-    trigger = Trigger('SOFTWARE') # Arduino trigger
+    trigger = Trigger('SOFTWARE')
     if not trigger.init(500):
         print('LPT port cannot be opened. Using mock trigger.')
         trigger = MockTrigger()

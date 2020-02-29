@@ -1,8 +1,8 @@
 # Introduction
 
-PyCNBI provides a real-time brain signal decoding framework. It has been applied on a couple of online decoding projects based on EEG and ECoG and on various acquisition systems including AntNeuro eego, g.tec gUSBamp, BioSemi ActiveTwo, BrainProducts actiCHamp and Wearable Sensing. The decoding runs at approximately 15 classifications per second(cps) on a 3rd-gen i7 laptop with 64-channel setup at 512 Hz sampling rate. High-speed decoding up to 200 cps was achieved using process-interleaving technique on 8 cores. It has been tested on both Linux and Windows using Python 3.6. Some parts of the code have been developed while participating [Microsoft Brain Signal Decoding competition](https://github.com/dbdq/microsoft_decoding).
+Neurodecode provides a real-time brain signal decoding framework. The decoding performance was recognised at [Microsoft Brain Signal Decoding competition](https://github.com/dbdq/microsoft_decoding) with the <i>First Prize Award</i> (2016) considering high decoding accuracy. It has been applied on a couple of online decoding projects based on EEG and ECoG and on various acquisition systems including AntNeuro eego, g.tec gUSBamp, BioSemi ActiveTwo, BrainProducts actiCHamp and Wearable Sensing. The decoding runs at approximately 15 classifications per second(cps) on a 4th-gen i7 laptop with 64-channel setup at 512 Hz sampling rate. High-speed decoding up to 200 cps was achieved using process-interleaving technique on 8 cores. It has been tested on both Linux and Windows using Python 3.7.
 
-The underlying data communication is based on Lab Streaming Layer (LSL) which provides sub-millisecond time synchronization accuracy. Any signal acquisition system supported by native LSL or OpenVibe is also supported by PyCNBI. Since the data communication is based on TCP, signals can be also transmitted wirelessly. For more information about LSL, please visit:
+The underlying data communication is based on Lab Streaming Layer (LSL) which provides sub-millisecond time synchronization accuracy. Any signal acquisition system supported by native LSL or OpenVibe is also supported by Neurodecode. Since the data communication is based on TCP, signals can be also transmitted wirelessly. For more information about LSL, please visit:
 [https://github.com/sccn/labstreaminglayer](https://github.com/sccn/labstreaminglayer)
 
 # Important modules
@@ -36,7 +36,7 @@ Contains various utilities.
 
 Anaconda is recommended for easy installation of Python environment.
 
-PyCNBI depends on following packages:
+Neurodecode depends on following packages:
   - scipy
   - numpy
   - PyQt5
@@ -52,21 +52,16 @@ PyCNBI depends on following packages:
   - xgboost
   - psutil
 
-You can install these using pip package manager. To install all at once, type:
-```
-pip install -U scipy numpy PyQt5 scikit-learn pylsl mne matplotlib pyqtgraph opencv-python pyserial future configparser xgboost psutil
-```
-
 Optional but strongly recommended:
   - [OpenVibe](http://openvibe.inria.fr/downloads)
 
-OpenVibe supports a wide range of acquisition servers and all acquisition systems supported by OpenVibe are supported by PyCNBI through LSL. Make sure you tick the checkbox "LSL_EnableLSLOutput" in Preferences when you run acquisition server. This will stream the data through the LSL network from which PyCNBI receives data. 
+OpenVibe supports a wide range of acquisition servers and all acquisition systems supported by OpenVibe are supported by Neurodecode through LSL. Make sure you tick the checkbox "LSL_EnableLSLOutput" in Preferences when you run acquisition server. This will stream the data through the LSL network from which Neurodecode receives data. 
 
 # Installation
 
 Clone the repository:
 ```
-git clone https://github.com/dbdq/pycnbi.git
+git clone https://github.com/dbdq/neurodecode.git
 ```
 
 Run setup script:
@@ -76,7 +71,7 @@ python setup.py develop
 Add "scripts" directory to PATH environment variable for convenient access to commonly used scripts.
 
 ## For Windows users, increase timer resolution
-The default timer resolution in some Windows versions is 16 ms, which can limit the precision of timings. It is strongly recommended to run the following tool and set the resolution to 1 ms or lower:
+The default timer resolution in some Windows versions is 16 ms, which can limit the precision of timings. It is recommended to run the following tool and set the resolution to 1 ms or lower:
 [https://vvvv.org/contribution/windows-system-timer-tool](https://vvvv.org/contribution/windows-system-timer-tool)
 
 

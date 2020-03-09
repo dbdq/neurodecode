@@ -434,8 +434,9 @@ def load_raw(rawfile, spfilter=None, spchannels=None, events_ext=None, multiplie
     else:
         tch = find_event_channel(raw)
         if tch is not None:
-            events = mne.find_events(raw, stim_channel=raw.ch_names[tch], shortest_event=1, uint_cast=True, consecutive='increasing')
-            # MNE's annoying hidden cockroach: first_samp
+            events = mne.find_events(raw, stim_channel=raw.ch_names[tch], shortest_event=1,
+                uint_cast=True, consecutive='increasing', output='onset', initial_event=True)
+            # some of MNE's functions do not correctly update first_samp, especially Raw.crop() function
             events[:, 0] -= raw.first_samp
         else:
             events = np.array([], dtype=np.int64)
@@ -505,7 +506,8 @@ def load_multi(src, spfilter=None, spchannels=None, multiplier=1):
     raw_merged = mne.io.RawArray(signals, info)
 
     # re-calculate event positions
-    events = mne.find_events(raw_merged, stim_channel='TRIGGER', shortest_event=1, consecutive=True)
+    events = mne.find_events(raw_merged, stim_channel='TRIGGER', shortest_event=1,
+        uint_cast=True, consecutive='increasing', output='onset', initial_event=True)
 
     return raw_merged, events
 

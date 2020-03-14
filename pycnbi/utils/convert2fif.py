@@ -449,6 +449,10 @@ def xdf2fif(filename, interactive=False, outdir=None):
     # channel x times
     data = pyxdf.load_xdf(filename)
     raw_data = data[0][0]['time_series'].T
+    if np.max(raw_data[:-1]) < 1:
+        logger.info('Assuming the signal unit is volate (V). Converting to uV')
+        raw_data[:-1] *= 10**6
+
     signals = np.concatenate((raw_data[-1, :].reshape(1, -1), raw_data[:-1, :]))
 
     sample_rate = int(data[0][0]['info']['nominal_srate'][0])

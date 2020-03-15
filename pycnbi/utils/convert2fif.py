@@ -437,6 +437,7 @@ def xdf2fif(filename, interactive=False, outdir=None):
     Convert XDF format
     """
     from pyxdf import pyxdf
+    pyxdf.logger.setLevel('WARNING')
 
     fdir, fname, fext = qc.parse_path_list(filename)
     if outdir is None:

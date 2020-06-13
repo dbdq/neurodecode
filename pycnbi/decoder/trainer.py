@@ -4,8 +4,9 @@ from __future__ import print_function, division
 trainer.py
 
 Perform cross-validation and train a classifier.
-See run() to see the flow.
+See run() to see the overall flow.
 
+When you add more classifiers, modify "CLASSIFIERS" variable to include your classifier.
 
 Kyuhwa Lee, 2018
 Swiss Federal Institute of Technology Lausanne (EPFL)
@@ -41,11 +42,16 @@ from builtins import input
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-from pycnbi import logger
 from pycnbi.decoder.rlda import rLDA
+from pycnbi import logger
 from pycnbi.triggers.trigger_def import trigger_def
 from pycnbi.gui.streams import redirect_stdout_to_queue
+
+# supported classifiers: add this part as you add more classifiers
+CLASSIFIERS = {'RF':RandomForestClassifier, 'GB':GradientBoostingClassifier, 'XGB':XGBClassifier,
+    'LGB':LGBMClassifier, 'LDA':LDA, 'rLDA':rLDA}
 
 # scikit-learn old version compatibility
 try:
@@ -71,10 +77,12 @@ def check_config(cfg):
                     'FEATURES',
                     'CLASSIFIER',
                     'CV_PERFORM'],
-                    'RF': ['trees', 'depth', 'seed'],
-                    'GB': ['trees', 'learning_rate', 'depth', 'seed'],
+                    'RF': ['n_estimators'],
+                    'GB': ['n_estimators', 'learning_rate'],
+                    'XGB': ['n_estimators', 'learning_rate'],
+                    'LGB': ['n_estimators', 'learning_rate'],
                     'LDA': [],
-                    'rLDA': ['r_coeff'],
+                    'rLDA': ['reg_cov'],
                     'StratifiedShuffleSplit': ['test_ratio', 'folds', 'seed', 'export_result'],
                     'LeaveOneOut': ['export_result']
     }
@@ -95,7 +103,7 @@ def check_config(cfg):
     for v in critical_vars['COMMON']:
         if not hasattr(cfg, v):
             logger.error('%s not defined in config.' % v)
-            raise RuntimeError
+            raise KeyError
 
     for key in optional_vars:
         if not hasattr(cfg, key):
@@ -106,55 +114,24 @@ def check_config(cfg):
         cfg.FEATURES['PSD']['decim'] = 1
 
     # classifier parameters check
-    selected_classifier = cfg.CLASSIFIER[cfg.CLASSIFIER['selected']]
-
-    if selected_classifier == 'RF':
-        if 'RF' not in cfg.CLASSIFIER:
-            logger.error('"RF" not defined in config.')
-            raise RuntimeError
-        for v in critical_vars['RF']:
-            if v not in cfg.CLASSIFIER['RF']:
-                logger.error('%s not defined in config.' % v)
-                raise RuntimeError
-
-    elif selected_classifier == 'GB' or selected_classifier == 'XGB':
-        if 'GB' not in cfg.CLASSIFIER:
-            logger.error('"GB" not defined in config.')
-            raise RuntimeError
-        for v in critical_vars['GB']:
-            if v not in cfg.CLASSIFIER[selected_classifier]:
-                logger.error('%s not defined in config.' % v)
-                raise RuntimeError
-
-    elif selected_classifier == 'rLDA':
-        if 'rLDA' not in cfg.CLASSIFIER:
-            logger.error('"rLDA" not defined in config.')
-            raise RuntimeError
-        for v in critical_vars['rLDA']:
-            if v not in cfg.CLASSIFIER['rLDA']:
-                logger.error('%s not defined in config.' % v)
-                raise RuntimeError
+    selected_classifier = cfg.CLASSIFIER['selected']
+    if selected_classifier not in cfg.CLASSIFIER:
+        logger.error('"%s" not defined in your config.' % selected_classifier)
+        raise KeyError
+    for v in critical_vars[selected_classifier]:
+        if v not in cfg.CLASSIFIER[selected_classifier]:
+            logger.error('parameter %s must be defined for %s classifier.' % (v, selected_classifier))
+            raise KeyError
 
     cv_selected = cfg.CV_PERFORM['selected']
     if cfg.CV_PERFORM[cv_selected] is not None:
-        if cv_selected == 'StratifiedShuffleSplit':
-            if 'StratifiedShuffleSplit' not in cfg.CV_PERFORM:
-                logger.error('"StratifiedShuffleSplit" not defined in config.')
-                raise RuntimeError
-            for v in critical_vars['StratifiedShuffleSplit']:
-                if v not in cfg.CV_PERFORM[cv_selected]:
-                    logger.error('%s not defined in config.' % v)
-                    raise RuntimeError
-
-        elif cv_selected == 'LeaveOneOut':
-            if 'LeaveOneOut' not in cfg.CV_PERFORM:
-                logger.error('"LeaveOneOut" not defined in config.')
-                raise RuntimeError
-            for v in critical_vars['LeaveOneOut']:
-                if v not in cfg.CV_PERFORM[cv_selected]:
-                    logger.error('%s not defined in config.' % v)
-                    raise RuntimeError
-
+        if cv_selected not in cfg.CV_PERFORM:
+            logger.error('"%s" not defined in config.' % cv_selected)
+            raise KeyError
+        for v in critical_vars[cv_selected]:
+            if v not in cfg.CV_PERFORM[cv_selected]:
+                logger.error('parameter %s must be defined for %s.' % (v, cv_selected))
+                raise KeyError
     if cfg.N_JOBS is None:
         cfg.N_JOBS = mp.cpu_count()
 
@@ -346,27 +323,11 @@ def balance_tpr(cfg, featdata):
 
     # Init a classifier
     selected_classifier = cfg.CLASSIFIER[cfg.CLASSIFIER['selected']]
-    if selected_classifier == 'GB':
-        cls = GradientBoostingClassifier(loss='deviance', learning_rate=cfg.CLASSIFIER['GB']['learning_rate'],
-                                         n_estimators=cfg.CLASSIFIER['GB']['trees'], subsample=1.0, max_depth=cfg.CLASSIFIER['GB']['depth'],
-                                         random_state=cfg.CLASSIFIER[selected_classifier]['seed'], max_features='sqrt', verbose=0, warm_start=False,
-                                         presort='auto')
-    elif selected_classifier == 'XGB':
-        cls = XGBClassifier(loss='deviance', learning_rate=cfg.CLASSIFIER['XGB']['learning_rate'],
-                                         n_estimators=cfg.CLASSIFIER['XGB']['trees'], subsample=1.0, max_depth=cfg.CLASSIFIER['XGB']['depth'],
-                                         random_state=cfg.CLASSIFIER['XGB']['seed'], max_features='sqrt', verbose=0, warm_start=False,
-                                         presort='auto')
-    elif selected_classifier == 'RF':
-        cls = RandomForestClassifier(n_estimators=cfg.CLASSIFIER['RF']['trees'], max_features='auto',
-                                     max_depth=cfg.CLASSIFIER['RF']['depth'], n_jobs=cfg.N_JOBS, random_state=cfg.CLASSIFIER['RF']['seed'],
-                                     oob_score=False, class_weight='balanced_subsample')
-    elif selected_classifier == 'LDA':
-        cls = LDA()
-    elif selected_classifier == 'rLDA':
-        cls = rLDA(cfg.CLASSIFIER['rLDA'])
-    else:
-        logger.error('Unknown classifier type %s' % selected_classifier)
+    if selected_classifier not in CLASSIFIERS:
+        logger.error('Unsupported classifier %s' % selected_classifier)
         raise ValueError
+    params = cfg.CLASSIFIER[selected_classifier]
+    cls = CLASSIFIERS[selected_classifier](**params)
 
     # Setup features
     X_data = featdata['X_data']
@@ -509,25 +470,11 @@ def cross_validate(cfg, featdata, cv_file=None):
     """
     # Init a classifier
     selected_classifier = cfg.CLASSIFIER['selected']
-    if selected_classifier == 'GB':
-        cls = GradientBoostingClassifier(loss='deviance', learning_rate=cfg.CLASSIFIER['GB']['learning_rate'], presort='auto',
-                                         n_estimators=cfg.CLASSIFIER['GB']['trees'], subsample=1.0, max_depth=cfg.CLASSIFIER['GB']['depth'],
-                                         random_state=cfg.CLASSIFIER['GB']['seed'], max_features='sqrt', verbose=0, warm_start=False)
-    elif selected_classifier == 'XGB':
-        cls = XGBClassifier(loss='deviance', learning_rate=cfg.CLASSIFIER['XGB']['learning_rate'], presort='auto',
-                                         n_estimators=cfg.CLASSIFIER['XGB']['trees'], subsample=1.0, max_depth=cfg.CLASSIFIER['XGB']['depth'],
-                                         random_state=cfg.CLASSIFIER['XGB'], max_features='sqrt', verbose=0, warm_start=False)
-    elif selected_classifier == 'RF':
-        cls = RandomForestClassifier(n_estimators=cfg.CLASSIFIER['RF']['trees'], max_features='auto',
-                                     max_depth=cfg.CLASSIFIER['RF']['depth'], n_jobs=cfg.N_JOBS, random_state=cfg.CLASSIFIER['RF']['seed'],
-                                     oob_score=False, class_weight='balanced_subsample')
-    elif selected_classifier == 'LDA':
-        cls = LDA()
-    elif selected_classifier == 'rLDA':
-        cls = rLDA(cfg.CLASSIFIER['rLDA']['r_coeff'])
-    else:
-        logger.error('Unknown classifier type %s' % selected_classifier)
+    if selected_classifier not in CLASSIFIERS:
+        logger.error('Unsupported classifier %s' % selected_classifier)
         raise ValueError
+    params = cfg.CLASSIFIER[selected_classifier]
+    cls = CLASSIFIERS[selected_classifier](**params)
 
     # Setup features
     X_data = featdata['X_data']
@@ -592,14 +539,7 @@ def cross_validate(cfg, featdata, cv_file=None):
     if cfg.CV_PERFORM[cfg.CV_PERFORM['selected']] in ['LeaveOneOut', 'StratifiedShuffleSplit']:
         txt += "mean %.3f, std: %.3f\n" % (cv_mean, cv_std)
     txt += 'Classifier: %s, ' % selected_classifier
-    if selected_classifier == 'RF':
-        txt += '%d trees, %s max depth, random state %s\n' % (
-            cfg.CLASSIFIER['RF']['trees'], cfg.CLASSIFIER['RF']['depth'], cfg.CLASSIFIER['RF']['seed'])
-    elif selected_classifier == 'GB' or selected_classifier == 'XGB':
-        txt += '%d trees, %s max depth, %s learing_rate, random state %s\n' % (
-            cfg.CLASSIFIER['GB']['trees'], cfg.CLASSIFIER['GB']['depth'], cfg.CLASSIFIER['GB']['learning_rate'], cfg.CLASSIFIER['GB']['seed'])
-    elif selected_classifier == 'rLDA':
-        txt += 'regularization coefficient %.2f\n' % cfg.CLASSIFIER['rLDA']['r_coeff']
+    txt += ', '.join(['%s=%s' % (k, params[k]) for k in params]) + '\n'
     if cfg.CV['IGNORE_THRES'] is not None:
         txt += 'Decision threshold: %.2f\n' % cfg.CV['IGNORE_THRES']
     txt += '\n- Confusion Matrix\n' + cm_txt
@@ -625,27 +565,11 @@ def train_decoder(cfg, featdata, feat_file=None):
     """
     # Init a classifier
     selected_classifier = cfg.CLASSIFIER['selected']
-    if selected_classifier == 'GB':
-        cls = GradientBoostingClassifier(loss='deviance', learning_rate=cfg.CLASSIFIER[selected_classifier]['learning_rate'],
-                                         n_estimators=cfg.CLASSIFIER[selected_classifier]['trees'], subsample=1.0, max_depth=cfg.CLASSIFIER[selected_classifier]['depth'],
-                                         random_state=cfg.CLASSIFIER[selected_classifier]['seed'], max_features='sqrt', verbose=0, warm_start=False,
-                                         presort='auto')
-    elif selected_classifier == 'XGB':
-        cls = XGBClassifier(loss='deviance', learning_rate=cfg.CLASSIFIER[selected_classifier]['learning_rate'],
-                                         n_estimators=cfg.CLASSIFIER[selected_classifier]['trees'], subsample=1.0, max_depth=cfg.CLASSIFIER[selected_classifier]['depth'],
-                                         random_state=cfg.GB['seed'], max_features='sqrt', verbose=0, warm_start=False,
-                                         presort='auto')
-    elif selected_classifier == 'RF':
-        cls = RandomForestClassifier(n_estimators=cfg.CLASSIFIER[selected_classifier]['trees'], max_features='auto',
-                                     max_depth=cfg.CLASSIFIER[selected_classifier]['depth'], n_jobs=cfg.N_JOBS, random_state=cfg.CLASSIFIER[selected_classifier]['seed'],
-                                     oob_score=False, class_weight='balanced_subsample')
-    elif selected_classifier == 'LDA':
-        cls = LDA()
-    elif selected_classifier == 'rLDA':
-        cls = rLDA(cfg.CLASSIFIER[selected_classifier][r_coeff])
-    else:
-        logger.error('Unknown classifier %s' % selected_classifier)
+    if selected_classifier not in CLASSIFIERS:
+        logger.error('Unsupported classifier %s' % selected_classifier)
         raise ValueError
+    params = cfg.CLASSIFIER[selected_classifier]
+    cls = CLASSIFIERS[selected_classifier](**params)
 
     # Setup features
     X_data = featdata['X_data']
@@ -698,7 +622,7 @@ def train_decoder(cfg, featdata, feat_file=None):
     # Show top distinctive features
     if cfg.FEATURES['selected'] == 'PSD':
         logger.info_green('Good features ordered by importance')
-        if selected_classifier in ['RF', 'GB', 'XGB']:
+        if selected_classifier in ['RF', 'GB', 'XGB', 'LGB']:
             keys, values = qc.sort_by_value(list(cls.feature_importances_), rev=True)
         elif selected_classifier in ['LDA', 'rLDA']:
             keys, values = qc.sort_by_value(cls.w, rev=True)
@@ -720,24 +644,23 @@ def train_decoder(cfg, featdata, feat_file=None):
                     ch_names.append('w%d-%s' % (w, ch_names[c]))
 
         chlist, hzlist = features.feature2chz(keys, fqlist, ch_names=ch_names)
-        valnorm = values[:cfg.FEAT_TOPN].copy()
+        valnorm = values.copy()
         valsum = np.sum(valnorm)
-        if valsum == 0:
-            valsum = 1
-        valnorm = valnorm / valsum * 100.0
+        if valsum > 0:
+            valnorm = valnorm / valsum * 100.0        
 
         # show top-N features
         for i, (ch, hz) in enumerate(zip(chlist, hzlist)):
             if i >= cfg.FEAT_TOPN:
                 break
             txt = '%-3s %5.1f Hz  normalized importance %-6s  raw importance %-6s  feature %-5d' %\
-                  (ch, hz, '%.2f%%' % valnorm[i], '%.2f%%' % (values[i] * 100.0), keys[i])
+                  (ch, hz, '%.2f%%' % valnorm[i], '%.2f' % values[i], keys[i])
             logger.info(txt)
 
         if cfg.EXPORT_GOOD_FEATURES:
             gfout.write('Importance(%) Channel Frequency Index\n')
             for i, (ch, hz) in enumerate(zip(chlist, hzlist)):
-                gfout.write('%.3f\t%s\t%s\t%d\n' % (values[i]*100.0, ch, hz, keys[i]))
+                gfout.write('%.3f\t%s\t%s\t%d\n' % (valnorm[i], ch, hz, keys[i]))
             gfout.close()
 
 

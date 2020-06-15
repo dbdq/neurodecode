@@ -101,7 +101,7 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
                 if qc.parse_path(f).ext in ['fif', 'bdf', 'gdf']:
                     flist.append(f)
         raw, events = pu.load_multi(flist)
-    else:
+    elif hasattr(cfg, 'DATA_FILE'):
         logger.info('Loading %s' % cfg.DATA_FILE)
         raw, events = pu.load_raw(cfg.DATA_FILE)
 
@@ -115,6 +115,9 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
             file_prefix = qc.parse_path(cfg.DATA_FILE).name
             outpath = export_path
             file_prefix = qc.parse_path(cfg.DATA_FILE).name
+    else:
+        logger.error('Either DATA_PATHS or DATA_FILE is required in config file')
+        raise ValueError
 
     # re-referencing
     if cfg.REREFERENCE is not None:

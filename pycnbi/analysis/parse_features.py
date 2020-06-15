@@ -69,6 +69,7 @@ def get_feature_scores(featfile, channels=None, freq_ranges=None, matfile=None):
     # initialise data structure
     data = {'channel':np.zeros(len(channels)), 'ch_names':channels,
         'raw':{ch:{} for ch in channels}, 'freq_ranges':freq_ranges}
+#        'norm':{ch:{} for ch in channels}}
     for band in freq_ranges:
         data[band] = np.zeros(len(channels))
 

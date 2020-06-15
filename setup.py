@@ -31,6 +31,7 @@ setup(
         'simplejson>=3.16.0',
         'scikit_learn>=0.21',
         'future',
-        'configparser'
+        'configparser',
+        'lightgbm>=2.3'
     ]
 )

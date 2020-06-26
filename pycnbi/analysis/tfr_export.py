@@ -78,6 +78,10 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
         raise NotImplementedError
     else:
         raise ValueError('Wrong TFR type %s' % tfr_type)
+    if cfg.DECIM_FACTOR is None:
+        decim = 1
+    else:
+        decim = int(cfg.DECIM_FACTOR)
     n_jobs = cfg.N_JOBS
     if n_jobs is None:
         n_jobs = mp.cpu_count()
@@ -138,7 +142,9 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
     # Apply filters
     raw = pu.preprocess(raw, spatial=cfg.SP_FILTER, spatial_ch=spchannels, spectral=cfg.TP_FILTER,
                   spectral_ch=picks, notch=cfg.NOTCH_FILTER, notch_ch=picks,
-                  multiplier=cfg.MULTIPLIER, n_jobs=n_jobs)
+                  multiplier=cfg.MULTIPLIER, n_jobs=n_jobs, decim=decim)
+    sfreq /= decim
+    events[:,0] //= decim
 
     # Read epochs
     classes = {}
@@ -211,7 +217,7 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
                 raise NotImplementedError
             else:
                 power[evname] = tfr(epochs, freqs=freqs, n_cycles=n_cycles, use_fft=False,
-                    return_itc=False, decim=1, n_jobs=n_jobs)
+                    return_itc=False, n_jobs=n_jobs)
                 power[evname] = power[evname].crop(tmin=tmin, tmax=tmax)
                 tfr_data = power[evname].data
 
@@ -242,7 +248,7 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
                     logger.WARNING('No %s epochs. Skipping.' % evname)
                     continue
                 power[evname] = tfr(epochs, freqs=freqs, n_cycles=n_cycles, use_fft=False,
-                    return_itc=False, decim=1, n_jobs=n_jobs)
+                    return_itc=False, n_jobs=n_jobs)
                 power[evname] = power[evname].crop(tmin=tmin, tmax=tmax)
                 if cfg.EXPORT_MATLAB is True:
                     # export all channels to MATLAB

@@ -49,6 +49,10 @@ def get_tfr_each_file(cfg, tfr_type='multitaper', recursive=False, export_path=N
     '''
 
     cfg = check_cfg(cfg)
+    if cfg.N_JOBS is None:
+        n_jobs = mp.cpu_count()
+    else:
+        n_jobs = cfg.N_JOBS
 
     t_buffer = cfg.T_BUFFER
     if tfr_type == 'multitaper':
@@ -62,7 +66,7 @@ def get_tfr_each_file(cfg, tfr_type='multitaper', recursive=False, export_path=N
         for f in qc.get_file_list(fifdir, fullpath=True, recursive=recursive):
             [fdir, fname, fext] = qc.parse_path_list(f)
             if fext in ['fif', 'bdf', 'gdf']:
-                get_tfr(f, cfg, tfr, cfg.N_JOBS)
+                get_tfr(f, cfg, tfr, n_jobs)
 
 def get_tfr(fif_file, cfg, tfr, n_jobs=1):
     raw, events = pu.load_raw(fif_file)

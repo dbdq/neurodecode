@@ -655,7 +655,8 @@ def log_decoding_helper(state, event_queue, amp_name=None, amp_serial=None, auto
     event_index = np.where(events != 0)[0]
     event_times = times[event_index].reshape(-1).tolist()
     event_values = events[event_index].tolist()
-    assert len(event_times) == len(event_values)
+    if len(event_times) != len(event_values):
+        logger.error('event_times length (%d) is different from event_values length (%d)' % (len(event_times), len(event_values)))
     event_queue.put((event_times, event_values))
 
 def log_decoding(decoder, logfile, amp_name=None, amp_serial=None, pklfile=True, matfile=False, autostop=False, prob_smooth=False):
@@ -746,8 +747,7 @@ def log_decoding(decoder, logfile, amp_name=None, amp_serial=None, pklfile=True,
         pdb.set_trace()
     t_start = prob_times[0]
     probs = np.vstack(probs)
-    event_times = np.array(event_times)
-    event_times = event_times[np.where(event_times >= t_start)[0]] - t_start
+    event_times = np.array(event_times) - t_start
     prob_times = np.array(prob_times) - t_start
     event_values = np.array(event_values)
     data = dict(probs=probs, prob_times=prob_times, event_times=event_times, event_values=event_values, labels=labels)

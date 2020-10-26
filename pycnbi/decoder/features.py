@@ -421,12 +421,16 @@ def compute_features(cfg):
     '''
     # Preprocessing, epoching and PSD computation
     ftrain = []
-    for f in qc.get_file_list(cfg.DATA_PATH, fullpath=True):
-        if f[-4:] in ['.fif', '.fiff']:
-            ftrain.append(f)
-    if len(ftrain) > 1 and cfg.PICKED_CHANNELS is not None and type(cfg.PICKED_CHANNELS[0]) == int:
-        logger.error('When loading multiple EEG files, PICKED_CHANNELS must be list of string, not integers because they may have different channel order.')
-        raise RuntimeError
+    if hasattr(cfg, 'DATA_FILES'):
+        ftrain = cfg.DATA_FILES
+        logger.info('Using file list defined in cfg.DATA_FILES.')
+    else:
+        for f in qc.get_file_list(cfg.DATA_PATH, fullpath=True):
+            if f[-4:] in ['.fif', '.fiff']:
+                ftrain.append(f)
+        if len(ftrain) > 1 and cfg.PICKED_CHANNELS is not None and type(cfg.PICKED_CHANNELS[0]) == int:
+            logger.error('When loading multiple EEG files, PICKED_CHANNELS must be list of string, not integers because they may have different channel order.')
+            raise RuntimeError
     raw, events = pu.load_multi(ftrain)
     
     reref = cfg.REREFERENCE[cfg.REREFERENCE['selected']]

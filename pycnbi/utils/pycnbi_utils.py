@@ -374,7 +374,6 @@ def preprocess(raw, sfreq=None, spatial=None, spatial_ch=None, spectral=None, sp
 
     # Apply notch filter
     if notch is not None:
-        assert False
         if notch_ch is None:
             notch_ch = eeg_channels
 
@@ -384,7 +383,7 @@ def preprocess(raw, sfreq=None, spatial=None, spatial_ch=None, spectral=None, sp
         else:
             notch_ch_i = notch_ch
 
-        mne.filter.notch_filter(data, Fs=sfreq, freqs=notch, notch_widths=3,
+        mne.filter.notch_filter(data, Fs=sfreq, freqs=notch, notch_widths=5,
                                 picks=notch_ch_i, method='fft', n_jobs=n_jobs, copy=False)
 
     if type(raw) == np.ndarray:

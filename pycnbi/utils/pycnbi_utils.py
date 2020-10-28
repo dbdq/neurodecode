@@ -676,5 +676,7 @@ def load_config(cfg_module):
         os.chdir(cwd)
     else:
         cfg = importlib.import_module(cfg_module)
+    # just in case cfg_module changed while calling this function again
+    importlib.reload(cfg)    
     logger.info('Loaded config %s' % cfg_module)
     return cfg

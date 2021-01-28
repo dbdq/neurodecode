@@ -117,17 +117,18 @@ def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_sta
         idx_chunk += 1
 
         if finished:
-            if auto_restart is False:
-                input('Reached the end of data. Press Enter to restart or Ctrl+C to stop.')
+            if auto_restart:
+                if wait_start:
+                    input('Reached the end of data. Press Enter to restart or Ctrl+C to stop.')
+                idx_chunk = 0
+                finished = False
+                if high_resolution:
+                    t_start = time.perf_counter()
+                else:
+                    t_start = time.time()
+                played += 1
             else:
-                logger.info('Reached the end of data. Restarting.')
-            idx_chunk = 0
-            finished = False
-            if high_resolution:
-                t_start = time.perf_counter()
-            else:
-                t_start = time.time()
-            played += 1
+                logger.info('Reached the end of data.')
 
 # sample code
 if __name__ == '__main__':

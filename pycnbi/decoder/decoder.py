@@ -39,7 +39,6 @@ from pycnbi.stream_receiver.stream_receiver import StreamReceiver
 mne.set_log_level('ERROR')
 os.environ['OMP_NUM_THREADS'] = '1' # actually improves performance for multitaper
 
-
 def get_decoder_info(classifier):
     """
     Get only the classifier information without connecting to a server
@@ -417,14 +416,13 @@ class BCIDecoderDaemon(object):
         """
 
         pid = os.getpid()
-        ps = psutil.Process(pid)
-        
+        ps = psutil.Process(pid)        
         if os.name == 'posix':
             # Unix
             ps.nice(0)      # A negative value increases priority but requires root privilages
         else:
             # Windows
-            ps.nice(psutil.HIGH_PRIORITY_CLASS)
+            ps.nice(psutil.REALTIME_PRIORITY_CLASS)
         
         logger.debug('[DecodeWorker-%-6d] Decoder worker process started' % (pid))
         decoder = BCIDecoder(classifier, buffer_size=self.buffer_sec, fake=self.fake,\

@@ -129,6 +129,7 @@ def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_sta
                 played += 1
             else:
                 logger.info('Reached the end of data.')
+                break
 
 # sample code
 if __name__ == '__main__':

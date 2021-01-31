@@ -158,7 +158,6 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
         else:
             classes[str(t_name)] = t_name
     if len(classes) == 0:
-        from IPython import embed; embed()
         raise ValueError('No desired event was found from the data.')
 
     try:

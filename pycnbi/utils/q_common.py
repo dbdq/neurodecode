@@ -83,6 +83,45 @@ def average_every_n(arr, n):
     end = n * int(len(arr) / n)
     return np.mean(arr[:end].reshape(-1, n), 1)
 
+def zscore_mod(X, axis=0):
+    """
+    Modified z-score for multidimensional arrays
+    
+    MAD = median(abs(X-median(X)))
+    MeanAD = mean(abs(X-mean(X)))
+    If MAD does equal 0 (if at least 50% of samples have the same value)
+      Subtract the median from the score and divide by 1.253314*MeanAD.
+      1.253314*MeanAD approximately equals the standard deviation.
+    If MAD does not equal 0
+      Subtract the median from the score and divide by 1.486*MAD.
+      1.486*MAD approximately equals the standard deviation.
+    
+    Reference:
+    https://www.ibm.com/docs/en/cognos-analytics/11.1.0?topic=terms-modified-z-score
+    """
+    # medians are computed for each trial for each feature
+    X_med = np.median(X, axis=axis)
+    # expand dimension for broadcasting
+    X_med_diff = X - np.expand_dims(X_med, axis=axis)
+    # compute MAD
+    X_mad = np.median(np.abs(X_med_diff), axis=axis)
+    
+    if X_mad.all():
+        # if all MADs are non-zero
+        X_norm = X_med_diff / (1.486 * np.expand_dims(X_mad, axis))
+    else:
+        # compute MeanAD
+        X_mean = np.mean(X, axis=axis)
+        X_mean_ad = np.mean(abs(X - np.expand_dims(X_mean, axis=axis)), axis=axis)        
+        X_mad_corrected = X_mad * 1.486
+        # replace 0 in MAD with a corresponding meanAD value
+        for zero_loc in np.array(np.where(X_mad==0)).T:
+            # zero_loc = every index containing 0 in MAD
+            zero_loc = tuple(zero_loc)
+            X_mad_corrected[zero_loc] = 1.253314 * X_mean_ad[zero_loc]
+        X_norm = X_med_diff / np.expand_dims(X_mad_corrected, axis)
+    return X_norm
+
 
 '''"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
  List/Dict related

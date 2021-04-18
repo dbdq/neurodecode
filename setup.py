@@ -32,6 +32,7 @@ setup(
         'scikit_learn>=0.21',
         'future',
         'configparser',
-        'lightgbm>=2.3'
+        'lightgbm>=2.3',
+        'mat73'
     ]
 )

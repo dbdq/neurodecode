@@ -18,7 +18,6 @@ import pdb
 import code
 import time
 import math
-import mat73
 import scipy.io
 import shutil
 import logging
@@ -115,10 +114,9 @@ def zscore_mod(X, axis=0):
         X_mean = np.mean(X, axis=axis)
         X_mean_ad = np.mean(abs(X - np.expand_dims(X_mean, axis=axis)), axis=axis)        
         X_mad_corrected = X_mad * 1.486
-        # replace 0 in MAD with a corresponding meanAD value
+        # replace 0 in MAD with the corresponding meanAD value
         for zero_loc in np.array(np.where(X_mad==0)).T:
-            # zero_loc = every index containing 0 in MAD
-            zero_loc = tuple(zero_loc)
+            zero_loc = tuple(zero_loc) # every index containing 0 in MAD
             X_mad_corrected[zero_loc] = 1.253314 * X_mean_ad[zero_loc]
         X_norm = X_med_diff / np.expand_dims(X_mad_corrected, axis)
     return X_norm
@@ -551,13 +549,8 @@ def loadmat(filename):
             else:
                 elem_list.append(sub_elem)
         return elem_list
-    
-    try:
-        data = scipy.io.loadmat(filename, struct_as_record=False, squeeze_me=True)
-        return _check_keys(data)
-    except NotImplementedError:
-        # MATLAB format 7.3 uses HDF5 and scipy cannot handle it
-        return mat73.loadmat(filename)
+    data = scipy.io.loadmat(filename, struct_as_record=False, squeeze_me=True)
+    return _check_keys(data)
 
 
 '''"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

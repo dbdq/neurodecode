@@ -18,6 +18,7 @@ import pdb
 import code
 import time
 import math
+import mat73
 import scipy.io
 import shutil
 import logging
@@ -549,8 +550,13 @@ def loadmat(filename):
             else:
                 elem_list.append(sub_elem)
         return elem_list
-    data = scipy.io.loadmat(filename, struct_as_record=False, squeeze_me=True)
-    return _check_keys(data)
+    try:
+        # old Matlab format
+        data = scipy.io.loadmat(filename, struct_as_record=False, squeeze_me=True)
+        return _check_keys(data)
+    except NotImplementedError:
+        # Matlab 7.3 and higher (HDF)
+        return mat73.loadmat(filename)
 
 
 '''"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

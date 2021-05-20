@@ -5,6 +5,17 @@ Neurodecode provides a real-time brain signal decoding framework. The decoding p
 The underlying data communication is based on Lab Streaming Layer (LSL) which provides sub-millisecond time synchronization accuracy. Any signal acquisition system supported by native LSL or OpenVibe is also supported by Neurodecode. Since the data communication is based on TCP, signals can be also transmitted wirelessly. For more information about LSL, please visit:
 [https://github.com/sccn/labstreaminglayer](https://github.com/sccn/labstreaminglayer)
 
+
+# Important update
+The GUI version of this software is now being developed and maintained by _Fondation Campus Biotech Geneva (FCBG)_
+
+https://github.com/fcbg-hnp/NeuroDecode
+
+Check out this documentation
+
+https://fcbg-hnp.github.io/NeuroDecode/sphinx/build/html/index.html
+
+
 # Important modules
 
 ### StreamReceiver

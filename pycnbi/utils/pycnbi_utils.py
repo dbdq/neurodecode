@@ -669,16 +669,11 @@ def raw_crop(raw, tmin, tmax):
 def load_config(cfg_module):
     cfg_module = cfg_module.replace('\\', '/')
     if '/' in cfg_module:
-        pp = qc.parse_path(cfg_module)
-        cwd = os.getcwd()
-        os.chdir(pp.dir)
-        cfg = importlib.import_module(pp.name)
-        # just in case cfg_module changed while calling this function again
-        importlib.reload(cfg)
-        os.chdir(cwd)
+        spec = importlib.util.spec_from_file_location(qc.parse_path(cfg_module).name, cfg_module)
+        cfg = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cfg)
     else:
         cfg = importlib.import_module(cfg_module)
-        # just in case cfg_module changed while calling this function again
-        importlib.reload(cfg)
+        importlib.reload(cfg) # in case cfg_module was dynamically changed
     logger.info('Loaded config %s' % cfg_module)
     return cfg

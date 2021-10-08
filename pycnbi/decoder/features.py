@@ -313,7 +313,7 @@ def get_timelags(epochs, wlen, wstep, downsample=1, picks=None):
     X: [epochs] x [windows] x [channels*freqs]
     y: [epochs] x [labels]
     """
-    
+
     '''
     wlen = int(wlen)
     wstep = int(wstep)
@@ -415,7 +415,8 @@ def compute_features(cfg):
     - w_frames: window length in frames
     - psde: MNE PSD estimator object
     - picks: channels used for feature computation
-    - sfreq: sampling frequency
+    - sfreq: input sampling frequency
+    - sfreq_features: feature sampling frequency
     - ch_names: channel names
     - times: feature timestamp (leading edge of a window)
     '''
@@ -432,14 +433,14 @@ def compute_features(cfg):
             logger.error('When loading multiple EEG files, PICKED_CHANNELS must be list of string, not integers because they may have different channel order.')
             raise RuntimeError
     raw, events = pu.load_multi(ftrain)
-    
+
     reref = cfg.REREFERENCE[cfg.REREFERENCE['selected']]
     if reref is not None:
         pu.rereference(raw, reref['New'], reref['Old'])
-    
+
     if cfg.LOAD_EVENTS[cfg.LOAD_EVENTS['selected']] is not None:
         events = mne.read_events(cfg.LOAD_EVENTS[cfg.LOAD_EVENTS['selected']])
-    
+
     trigger_def_int = set()
     for a in cfg.TRIGGER_DEF:
         trigger_def_int.add(getattr(cfg.tdef, a))
@@ -540,5 +541,7 @@ def compute_features(cfg):
 
     featdata['picks'] = picks
     featdata['sfreq'] = raw.info['sfreq']
-    featdata['ch_names'] = raw.ch_names
+    featdata['sfreq_features'] = raw.info['sfreq'] / cfg.FEATURES['PSD']['wstep']
+    featdata['wlen'] = cfg.FEATURES['PSD']['wlen']
+    featdata['ch_names'] = [raw.ch_names[i] for i in picks]
     return featdata

@@ -27,7 +27,7 @@ import traceback
 import itertools
 import numpy as np
 import sklearn.metrics
-import multiprocessing as mp
+import matplotlib.pyplot as plt
 
 # logger
 try:
@@ -87,7 +87,7 @@ def average_every_n(arr, n):
 def zscore_mod(X, axis=0):
     """
     Modified z-score for multidimensional arrays
-    
+
     MAD = median(abs(X-median(X)))
     MeanAD = mean(abs(X-mean(X)))
     If MAD does equal 0 (if at least 50% of samples have the same value)
@@ -96,7 +96,7 @@ def zscore_mod(X, axis=0):
     If MAD does not equal 0
       Subtract the median from the score and divide by 1.486*MAD.
       1.486*MAD approximately equals the standard deviation.
-    
+
     Reference:
     https://www.ibm.com/docs/en/cognos-analytics/11.1.0?topic=terms-modified-z-score
     """
@@ -106,14 +106,14 @@ def zscore_mod(X, axis=0):
     X_med_diff = X - np.expand_dims(X_med, axis=axis)
     # compute MAD
     X_mad = np.median(np.abs(X_med_diff), axis=axis)
-    
+
     if X_mad.all():
         # if all MADs are non-zero
         X_norm = X_med_diff / (1.486 * np.expand_dims(X_mad, axis))
     else:
         # compute MeanAD
         X_mean = np.mean(X, axis=axis)
-        X_mean_ad = np.mean(abs(X - np.expand_dims(X_mean, axis=axis)), axis=axis)        
+        X_mean_ad = np.mean(abs(X - np.expand_dims(X_mean, axis=axis)), axis=axis)
         X_mad_corrected = X_mad * 1.486
         # replace 0 in MAD with the corresponding meanAD value
         for zero_loc in np.array(np.where(X_mad==0)).T:
@@ -294,7 +294,7 @@ def parse_path(file_path):
     """
     Input:
         full path
-    
+
     Returns:
         self.dir = base directory of the file
         self.name = file name without extension
@@ -325,7 +325,7 @@ def parse_path_list(path):
     """
     Input:
         full path
-    
+
     Returns:
         base dir, file(or dir) name, extension (if file)
     """
@@ -631,6 +631,95 @@ def confusion_matrix(Y_true, Y_pred, label_len=6):
 
     return cm_txt, acc
 
+
+'''"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+ Matplotlib
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""'''
+
+def plot_imagesc(img, title='', colorbar=True, **kwargs):
+    """
+    Plot 2-D array as image with autoscaling with a color range [med-std, med+std]
+    """
+    plt.imshow(img, aspect='auto', interpolation='none', origin='lower', **kwargs)
+    if colorbar:
+        plt.colorbar()
+    std = np.std(img, axis=None)
+    med = np.median(img, axis=None)
+    plt.clim([med-std, med+std])
+    plt.title(title)
+    plt.show(block=False)
+
+def plot_cm(Y_pred, Y_test, labels, title_prefix='', print_console=True):
+    """
+    Plot confusion matrix
+    """
+    N = len(Y_pred)
+    cm_norm = 'true' #'true', None
+    cm = sklearn.metrics.confusion_matrix(Y_test, Y_pred, normalize=cm_norm, labels=labels)
+    cm_raw = sklearn.metrics.confusion_matrix(Y_test, Y_pred, normalize=None, labels=labels)
+    img = sklearn.metrics.ConfusionMatrixDisplay(cm, display_labels=labels)
+    img.plot(cmap=plt.cm.Blues)
+    accuracy = sklearn.metrics.accuracy_score(Y_test, Y_pred)
+    f1_score = sklearn.metrics.f1_score(Y_test, Y_pred, average='macro')
+    plt.title('%s Confusion matrix (f1=%.2f, acc=%.2f, N=%d)' % (title_prefix, f1_score, accuracy, N))
+    if print_console:
+        print(sklearn.metrics.classification_report(Y_test, Y_pred, labels=labels))
+        print('%s Confusion matrix (raw values)' % title_prefix)
+        print(cm_raw)
+    plt.show(block=False)
+    plt.ioff()
+    plt.pause(0.05)
+
+def plot_cm_le(Y_pred, Y_test, le, title_prefix='', print_console=True):
+    """
+    Plot confusion matrix using label encoder
+    """
+    N = len(Y_pred)
+    cm_norm = 'true' #'true', None
+    cm = sklearn.metrics.confusion_matrix(Y_test, Y_pred, normalize=cm_norm)
+    img = sklearn.metrics.ConfusionMatrixDisplay(cm, display_labels=le.classes_)
+    img.plot(cmap=plt.cm.Blues)
+    accuracy = sklearn.metrics.accuracy_score(Y_test, Y_pred)
+    f1_score = sklearn.metrics.f1_score(Y_test, Y_pred, average='macro')
+    plt.title('%s Confusion matrix (f1=%.2f, acc=%.2f, N=%d)' % (title_prefix, f1_score, accuracy, N))
+    if print_console:
+        print(sklearn.metrics.classification_report(Y_test, Y_pred, target_names=le.classes_))
+        print(sklearn.metrics.confusion_matrix(Y_test, Y_pred, normalize=None))
+        print('%s Confusion matrix (raw values)' % title_prefix)
+    plt.show(block=False)
+    plt.ioff()
+    plt.pause(0.05)
+
+def plot_errorbar(data, method='std', ticks=None, title=None, **kwargs):
+    """
+    Plot horizontal errorbar from an array of samples
+
+    data: Numpy array of dimension [samples] x [variables]
+    method:
+      sem: standard error of means
+      std: standard deviation
+    ticks: bar tick labels
+    """
+    if type(data) == list:
+        data = np.array(data)
+    elif type(data) != np.ndarray:
+        raise ValueError('Unsupported data type %s' % type(data))
+    if len(data.shape) != 2:
+        raise ValueError('Input must be of 2 dimensions')
+    if method == 'std':
+        n = 1
+    elif method == 'sem':
+        n = len(data)
+    else:
+        raise ValueError('Unsupported method: %s' % method)
+    if ticks is None:
+        ticks = ['%d'%x for x in range(data.shape[1])]
+    if title is None:
+        title = ''
+    mean = np.mean(data, axis=0)
+    std = np.std(data, axis=0)
+    plt.bar(x=ticks, height=mean, yerr=std/n, **kwargs)
+    plt.title(title)
 
 '''"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
  ETC

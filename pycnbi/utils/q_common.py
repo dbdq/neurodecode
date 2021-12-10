@@ -636,7 +636,7 @@ def confusion_matrix(Y_true, Y_pred, label_len=6):
  Matplotlib
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""'''
 
-def plot_imagesc(img, title='', colorbar=True, **kwargs):
+def plot_imagesc(img, x=None, y=None, title='', colorbar=True, **kwargs):
     """
     Plot 2-D array as image with autoscaling with a color range [med-std, med+std]
     """
@@ -646,6 +646,24 @@ def plot_imagesc(img, title='', colorbar=True, **kwargs):
     std = np.std(img, axis=None)
     med = np.median(img, axis=None)
     plt.clim([med-std, med+std])
+    if x is not None:
+        if len(x) <= 10:
+            xstep = 1
+        xstep = len(x) // 10
+        if type(x[0]) == str:
+            xticklabels = x[::xstep]
+        else:
+            xticklabels = x.round(6)[::xstep]
+        plt.xticks(range(0, img.shape[1], xstep), xticklabels)
+    if y is not None:
+        if len(y) <= 10:
+            ystep = 1
+        ystep = len(y) // 10
+        if type(x[0]) == str:
+            yticklabels = y[::ystep]
+        else:
+            yticklabels = y.round(6)[::ystep]
+        plt.yticks(range(0, img.shape[0], ystep), yticklabels)
     plt.title(title)
     plt.show(block=False)
 

@@ -6,7 +6,7 @@ The underlying data communication is based on Lab Streaming Layer (LSL) which pr
 [https://github.com/sccn/labstreaminglayer](https://github.com/sccn/labstreaminglayer)
 
 
-# Important update
+# GUI version
 The GUI version of this software is now being developed and maintained by _Fondation Campus Biotech Geneva (FCBG)_
 
 https://github.com/fcbg-hnp/NeuroDecode

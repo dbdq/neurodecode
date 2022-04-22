@@ -72,16 +72,6 @@ python setup.py develop
 Add "scripts" directory to PATH environment variable for convenient access to commonly used scripts.
 
 
-# GUI version
-The GUI version of this software is now being developed and maintained by _Fondation Campus Biotech Geneva (FCBG)_
-
-https://github.com/fcbg-hnp/NeuroDecode
-
-Check out this documentation
-
-https://fcbg-hnp.github.io/NeuroDecode/sphinx/build/html/index.html
-
-
 ## For Windows users, increase timer resolution
 The default timer resolution in some Windows versions is 16 ms, which can limit the precision of timings. It is recommended to run the following tool and set the resolution to 1 ms or lower:
 [https://vvvv.org/contribution/windows-system-timer-tool](https://vvvv.org/contribution/windows-system-timer-tool)

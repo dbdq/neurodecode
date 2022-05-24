@@ -247,7 +247,7 @@ def make_dirs(dirname, delete=False):
     if not os.path.exists(dirname):
         os.makedirs(dirname)
 
-def save_obj(fname, obj, protocol=pickle.HIGHEST_PROTOCOL):
+def save_obj(fname, obj, protocol=4):
     """
     Save python object into a file
     Set protocol=2 for Python 2 compatibility
@@ -640,6 +640,10 @@ def plot_imagesc(img, x=None, y=None, title='', colorbar=True, **kwargs):
     """
     Plot 2-D array as image with autoscaling with a color range [med-std, med+std]
     """
+    # sanity check
+    if len(x) != img.shape[1] or len(y) != img.shape[0]:
+        raise ValueError('yicks (%d) and xticks (%d) do not correspond to image shape %s' % (len(x), len(y), img.shape))
+
     plt.imshow(img, aspect='auto', interpolation='none', origin='lower', **kwargs)
     if colorbar:
         plt.colorbar()
@@ -649,8 +653,9 @@ def plot_imagesc(img, x=None, y=None, title='', colorbar=True, **kwargs):
     if x is not None:
         if len(x) <= 10:
             xstep = 1
-        xstep = len(x) // 10
-        if type(x[0]) == str:
+        else:
+            xstep = len(x) // 10
+        if type(x[0]) in [str, np.str_]:
             xticklabels = x[::xstep]
         else:
             xticklabels = x.round(6)[::xstep]
@@ -658,8 +663,9 @@ def plot_imagesc(img, x=None, y=None, title='', colorbar=True, **kwargs):
     if y is not None:
         if len(y) <= 10:
             ystep = 1
-        ystep = len(y) // 10
-        if type(x[0]) == str:
+        else:
+            ystep = len(y) // 10
+        if type(y[0]) in [str, np.str_]:
             yticklabels = y[::ystep]
         else:
             yticklabels = y.round(6)[::ystep]
@@ -738,6 +744,15 @@ def plot_errorbar(data, method='std', ticks=None, title=None, **kwargs):
     std = np.std(data, axis=0)
     plt.bar(x=ticks, height=mean, yerr=std/n, **kwargs)
     plt.title(title)
+
+def pvalue2txt(pvalue, max_precision=3):
+    if pvalue >= 10**(-max_precision):
+        txt = ('p=%%.%df' % max_precision) % pvalue
+    elif pvalue == 0:
+        txt = 'p<10^-32'
+    else:
+        txt = 'p<=10^%d' % math.ceil(math.log10(pvalue))
+    return txt
 
 '''"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
  ETC

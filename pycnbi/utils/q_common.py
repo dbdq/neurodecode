@@ -641,7 +641,7 @@ def plot_imagesc(img, x=None, y=None, title='', colorbar=True, **kwargs):
     Plot 2-D array as image with autoscaling with a color range [med-std, med+std]
     """
     # sanity check
-    if len(x) != img.shape[1] or len(y) != img.shape[0]:
+    if (x is not None and y is not None) and (len(x) != img.shape[1] or len(y) != img.shape[0]):
         raise ValueError('yicks (%d) and xticks (%d) do not correspond to image shape %s' % (len(x), len(y), img.shape))
 
     plt.imshow(img, aspect='auto', interpolation='none', origin='lower', **kwargs)

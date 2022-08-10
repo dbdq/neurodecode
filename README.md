@@ -72,7 +72,7 @@ python setup.py develop
 Add "scripts" directory to PATH environment variable for convenient access to commonly used scripts.
 
 ## PyQt version problem
-QT is very sensitive to version and needs to be compatible with all dependencies.
+The Qt library is very sensitive to version and needs to be compatible with all dependencies.
 If you experience pyqtgraph complaining incompatible PyQt version (e.g. PyQt < 5.12), try:
 ```
 conda remove pyqt

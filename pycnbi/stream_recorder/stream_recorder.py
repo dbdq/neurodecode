@@ -132,7 +132,7 @@ def run(record_dir, amp_name, amp_serial, eeg_only=False, queue=None):
 def batch_run(record_dir=None, amp_name=None, amp_serial=None):
     # configure LSL server name and device serial if available
     if not record_dir:
-        record_dir = '%s/records' % os.getcwd()
+        record_dir = '%s/records' % os.path.expanduser('~')
     if not amp_name:
         amp_name, amp_serial = pu.search_lsl(ignore_markers=True)
     run(record_dir, amp_name=amp_name, amp_serial=amp_serial)

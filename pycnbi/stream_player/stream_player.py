@@ -134,6 +134,7 @@ def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_sta
 # sample code
 if __name__ == '__main__':
     server_name = 'StreamPlayer'
-    chunk_size = 8  # chunk streaming frequency in Hz
-    fif_file = r'D:\data\CHUV\ECoG17\20171008\fif_corrected\ANKTOE_left_vs_right\Oct08-08.fif'
+    chunk_size = 8
+    fif_file = '../../mi_left_right.fif'
     stream_player(server_name, fif_file, chunk_size)
+

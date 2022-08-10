@@ -290,9 +290,11 @@ class Scope(QMainWindow):
             (self.config['eeg_channels'], self.config['eeg_channels']),
             dtype=float)
         np.fill_diagonal(self.matrix_lap, 1)
+        '''
         self.matrix_lap[2, 0] = -1
         self.matrix_lap[0, 2] = -0.25
         self.matrix_lap[0, 2] = -0.25
+        '''
 
         # BP initialization
         self.apply_bandpass = int(

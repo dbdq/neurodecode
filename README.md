@@ -71,6 +71,15 @@ python setup.py develop
 ```
 Add "scripts" directory to PATH environment variable for convenient access to commonly used scripts.
 
+## PyQt version problem
+QT is very sensitive to version and needs to be compatible with all dependencies.
+If you experience pyqtgraph complaining incompatible PyQt version (e.g. PyQt < 5.12), try:
+```
+conda remove pyqt
+pip install -U PyQt5
+```
+This can be caused by Anaconda not having the latest PyQt version.
+
 
 ## For Windows users, increase timer resolution
 The default timer resolution in some Windows versions is 16 ms, which can limit the precision of timings. It is recommended to run the following tool and set the resolution to 1 ms or lower:

@@ -124,4 +124,4 @@ This package was developed as part of the following works:
   - Yohann Thenaisie* and Kyuhwa Lee* <i>et al.</i>, "Principles of gait encoding in the subthalamic nucleus of people with Parkinson's disease", <i>Science Translational Medicine</i>, 2022, Vol. 14, No. 661, p. eabo1800.<br>(* first authors as equal contribution)
   - Kyuhwa Lee <i>et al.</i>, "A Brain-Controlled Exoskeleton with Cascaded Event-Related Desynchronization Classifiers", <i>Robotics and Autonomous Systems</i>, Elsevier, 2016, p. 15-23.
    
-If some of the codes here were useful or helpful for your project, I would highly appreciate if you could cite the above papers.
+If some of the code here were useful or helpful for your project, I would greatly appreciate if you could cite one of the above papers.

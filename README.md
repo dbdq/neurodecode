@@ -120,7 +120,7 @@ The codes are released under [GNU General Public License](https://www.gnu.org/li
 
 
 # Citation
-The codes have been written as part of the following works:
+This package was developed as part of the following works:
   - Yohann Thenaisie* and Kyuhwa Lee* <i>et al.</i>, "Principles of gait encoding in the subthalamic nucleus of people with Parkinson's disease", <i>Science Translational Medicine</i>, 2022, Vol. 14, No. 661, p. eabo1800.<br>(* first authors as equal contribution)
   - Kyuhwa Lee <i>et al.</i>, "A Brain-Controlled Exoskeleton with Cascaded Event-Related Desynchronization Classifiers", <i>Robotics and Autonomous Systems</i>, Elsevier, 2016, p. 15-23.
    

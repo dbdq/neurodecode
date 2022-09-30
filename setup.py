@@ -1,13 +1,13 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='pycnbi',
-    version='0.9dev',
+    name='neurodecode',
+    version='1.0dev',
     author='Kyuhwa Lee, Arnaud Desvachez',
     author_email='lee.kyuh@gmail.com, arnaud.desvachez@gmail.com',
     license='The GNU General Public License',
-    url='https://github.com/dbdq/pycnbi/',
-    description='Real-time brain-machine interface',
+    url='https://github.com/dbdq/neurodecode/',
+    description='Real-time brain signal decoding framework',
     long_description=open('README.md').read(),
     packages=find_packages(),
     install_requires=[
@@ -23,7 +23,6 @@ setup(
         'setuptools>=39.0.1',
         'pyqtgraph>=0.10.0',
         'pylsl>=1.12.2',
-        #'pywin32>=222',
         'ipython>=6',
         'PyQt5>=5',
         'pyxdf>=1.15.2',

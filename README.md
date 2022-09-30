@@ -60,13 +60,14 @@ OpenVibe supports a wide range of acquisition servers and all acquisition system
 
 # Installation
 
-Clone the repository:
+Neurodecode can be installed from PyPI.
 ```
-git clone https://github.com/dbdq/neurodecode.git
+pip install neurodecode
 ```
 
-Run setup script:
+To install the latest version, clone the repository and run setup script:
 ```
+git clone https://github.com/dbdq/neurodecode.git
 python setup.py develop
 ```
 Add "scripts" directory to PATH environment variable for convenient access to commonly used scripts.

@@ -9,6 +9,7 @@ setup(
     url='https://github.com/dbdq/neurodecode/',
     description='Real-time brain signal decoding framework',
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     packages=find_packages(),
     install_requires=[
         'h5py>=2.7',
@@ -21,7 +22,7 @@ setup(
         'mne>=0.16',
         'psutil>=5.4.8',
         'setuptools>=39.0.1',
-        'pyqtgraph>=0.10.0',
+        'pyqtgraph<=0.12.4', # version 0.13 removed GraphicsWindow()
         'pylsl>=1.12.2',
         'ipython>=6',
         'PyQt5>=5',

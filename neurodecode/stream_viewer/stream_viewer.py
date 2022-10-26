@@ -182,7 +182,7 @@ class Scope(QMainWindow):
         self.bool_parser = {True:'1', False:'0'}
 
         # PyQTGraph plot initialization
-        self.win = pg.GraphicsLayoutWidget()
+        self.win = pg.GraphicsWindow()
         self.win.setWindowTitle('EEG Scope')
         self.win.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint)
         self.win.keyPressEvent = self.keyPressEvent

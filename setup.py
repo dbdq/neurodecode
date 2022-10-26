@@ -1,8 +1,12 @@
+import os
 from setuptools import find_packages, setup
+
+if not os.path.exists('./pycnbi'):
+    os.symlink('./neurodecode', './pycnbi', True)
 
 setup(
     name='neurodecode',
-    version='1.0dev',
+    version='1.1',
     author='Kyuhwa Lee, Arnaud Desvachez',
     author_email='lee.kyuh@gmail.com, arnaud.desvachez@gmail.com',
     license='The GNU General Public License',
@@ -22,7 +26,7 @@ setup(
         'mne>=0.16',
         'psutil>=5.4.8',
         'setuptools>=39.0.1',
-        'pyqtgraph<=0.12.4', # version 0.13 removed GraphicsWindow()
+        'pyqtgraph>=0.13',
         'pylsl>=1.12.2',
         'ipython>=6',
         'PyQt5>=5',
@@ -34,5 +38,6 @@ setup(
         'configparser',
         'lightgbm>=2.3',
         'mat73'
-    ]
+    ],
+    scripts=[]
 )

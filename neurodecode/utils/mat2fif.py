@@ -22,8 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import scipy.io
 import numpy as np
-import pycnbi.utils.q_common as qc
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+from neurodecode import logger
 import mne
 
 def mat2fif(mat_file, sample_rate, data_field, event_field):

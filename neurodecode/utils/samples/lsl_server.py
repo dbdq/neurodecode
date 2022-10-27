@@ -1,8 +1,8 @@
 from __future__ import print_function, division
 
-import pycnbi
+import neurodecode
 import random
-import pycnbi.utils.cnbi_lsl as cnbi_lsl
+import neurodecode.utils.cnbi_lsl as cnbi_lsl
 
 LSL_SERVER = 'RexController'
 vals = [3, 5, 6, 7]

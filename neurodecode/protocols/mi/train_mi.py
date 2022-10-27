@@ -27,14 +27,14 @@ import os
 import cv2
 import random
 import multiprocessing as mp
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.triggers.pyLptControl as pyLptControl
-from pycnbi.protocols.viz_bars import BarVisual
-from pycnbi.triggers.trigger_def import trigger_def
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+import neurodecode.triggers.pyLptControl as pyLptControl
+from neurodecode.protocols.viz_bars import BarVisual
+from neurodecode.triggers.trigger_def import trigger_def
+from neurodecode import logger
 from builtins import input
-from pycnbi.gui.streams import redirect_stdout_to_queue
+from neurodecode.gui.streams import redirect_stdout_to_queue
 
 def check_config(cfg):
     critical_vars = {
@@ -82,19 +82,8 @@ def batch_run(cfg_module):
     check_config(cfg)
     run(cfg)
 
-def run(cfg, state=mp.Value('i', 1), queue=None):
-
-    redirect_stdout_to_queue(logger, queue, 'INFO')
-
-    # Wait the recording to start (GUI)
-    while state.value == 2: # 0: stop, 1:start, 2:wait
-        pass
-    #  Protocol start if equals to 1
-    if not state.value:
-        sys.exit()
-
+def run(cfg):
     refresh_delay = 1.0 / cfg.REFRESH_RATE
-
     cfg.tdef = trigger_def(cfg.TRIGGER_FILE)
 
     # visualizer
@@ -117,7 +106,7 @@ def run(cfg, state=mp.Value('i', 1), queue=None):
     if cfg.TRIGGER_DEVICE is None:
         logger.warning('No trigger device set. Press Ctrl+C to stop or Enter to continue.')
         #input()
-    trigger = pyLptControl.Trigger(state, cfg.TRIGGER_DEVICE)
+    trigger = pyLptControl.Trigger(cfg.TRIGGER_DEVICE)
     if trigger.init(50) == False:
         logger.error('\n** Error connecting to USB2LPT device. Use a mock trigger instead?')
         input('Press Ctrl+C to stop or Enter to continue.')
@@ -151,7 +140,7 @@ def run(cfg, state=mp.Value('i', 1), queue=None):
                 bar.put_text('Press any key')
                 bar.update()
                 key = cv2.waitKey()
-                if key == keys['esc'] or not state.value:
+                if key == keys['esc']:
                     break
                 bar.fill()
             bar.put_text('Trial %d / %d' % (trial, num_trials))
@@ -234,14 +223,10 @@ def run(cfg, state=mp.Value('i', 1), queue=None):
 
         bar.update()
         key = 0xFF & cv2.waitKey(1)
-        if key == keys['esc'] or not state.value:
+        if key == keys['esc']:
             break
 
     bar.finish()
-
-    with state.get_lock():
-        state.value = 0
-
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:

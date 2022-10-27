@@ -25,7 +25,7 @@ import sys
 import time
 import pylsl
 import multiprocessing as mp
-from pycnbi import logger
+from neurodecode import logger
 
 
 def start_server(server_name, n_channels=1, channel_format='string', nominal_srate=pylsl.IRREGULAR_RATE, stype='EEG',
@@ -66,7 +66,7 @@ def start_server(server_name, n_channels=1, channel_format='string', nominal_sra
     return pylsl.StreamOutlet(sinfo)
 
 
-def start_client(server_name, state=mp.Value('i', 1)):
+def start_client(server_name):
     """
     Search and connect to an LSL server
 
@@ -74,8 +74,6 @@ def start_client(server_name, state=mp.Value('i', 1)):
     ------
     server_name:
         Name of the server to search
-    state:
-        Multiprocessing.Value used to stop from the GUI, 1: acquire 0:stop
 
     Returns
     -------
@@ -84,8 +82,6 @@ def start_client(server_name, state=mp.Value('i', 1)):
 
     """
     while True:
-        if not state.value:
-            sys.exit(-1) 
         logger.info('Searching for LSL server %s ...' % server_name)
         streamInfos = pylsl.resolve_byprop("name", server_name, timeout=1)
         if not streamInfos:

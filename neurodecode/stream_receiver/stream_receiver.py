@@ -34,10 +34,10 @@ import math
 import time
 import pylsl
 import numpy as np
-import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.utils.q_common as qc
-from pycnbi.utils.pycnbi_utils import find_event_channel
-from pycnbi import logger
+import neurodecode.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
+from neurodecode.utils.pycnbi_utils import find_event_channel
+from neurodecode import logger
 
 class StreamReceiver:
     def __init__(self, window_size=1, buffer_size=1, amp_serial=None, eeg_only=False, amp_name=None):

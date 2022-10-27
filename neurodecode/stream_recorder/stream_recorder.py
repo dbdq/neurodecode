@@ -34,14 +34,14 @@ import time
 import datetime
 import numpy as np
 import multiprocessing as mp
-import pycnbi.utils.add_lsl_events
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
-from pycnbi.utils.convert2fif import pcl2fif
-from pycnbi.utils.cnbi_lsl import start_server
-from pycnbi.gui.streams import redirect_stdout_to_queue
-from pycnbi.stream_receiver.stream_receiver import StreamReceiver
-from pycnbi import logger
+import neurodecode.utils.add_lsl_events
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+from neurodecode.utils.convert2fif import pcl2fif
+from neurodecode.utils.cnbi_lsl import start_server
+from neurodecode.gui.streams import redirect_stdout_to_queue
+from neurodecode.stream_receiver.stream_receiver import StreamReceiver
+from neurodecode import logger
 from builtins import input
 
 

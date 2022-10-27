@@ -22,15 +22,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
-import pycnbi
+import neurodecode
 import cv2
 import os
-import pycnbi.utils.q_common as qc
+import neurodecode.utils.q_common as qc
 import numpy as np
 import time
 import serial
 import serial.tools.list_ports
-from pycnbi import logger
+from neurodecode import logger
 
 # global constants
 KEYS = {'right':2555904, 'up':2490368, 'left':2424832, 'down':2621440, 'pgup':85, 'pgdn':86, 'home':80, 'end':87, 'space':32, 'esc':27}
@@ -44,7 +44,7 @@ class Feedback:
     Perform a classification with visual feedback
     """
 
-    def __init__(self, cfg, state, viz, tdef, trigger, logfile=None):
+    def __init__(self, cfg, viz, tdef, trigger, logfile=None):
         self.cfg = cfg
         self.tdef = tdef
         self.trigger = trigger
@@ -56,8 +56,7 @@ class Feedback:
         self.bar_step_up = self.cfg.BAR_STEP['up']
         self.bar_step_down = self.cfg.BAR_STEP['down']
         self.bar_step_both = self.cfg.BAR_STEP['both']
-        self.protocol_state = state      # Shared variable to stop the protocol from the GUI
-        
+
         if type(self.cfg.BAR_BIAS) is tuple:
             self.bar_bias = list(self.cfg.BAR_BIAS)
         else:
@@ -124,7 +123,7 @@ class Feedback:
                     self.viz.put_text('Press any key')
                     self.viz.update()
                     key = cv2.waitKeyEx()
-                    if key == KEYS['esc'] or not self.protocol_state.value:
+                    if key == KEYS['esc']:
                         return
                 self.viz.fill()
                 self.tm_trigger.reset()
@@ -417,7 +416,7 @@ class Feedback:
 
             self.viz.update()
             key = cv2.waitKeyEx(1)
-            if key == KEYS['esc'] or not self.protocol_state.value:
+            if key == KEYS['esc']:
                 return
             elif key == KEYS['space']:
                 dx = 0

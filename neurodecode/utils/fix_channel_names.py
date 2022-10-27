@@ -1,8 +1,8 @@
 from __future__ import print_function, division
 
-import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.utils.q_common as qc
-from pycnbi import logger
+import neurodecode.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
+from neurodecode import logger
 
 def fix_channel_names(fif_dir, new_channel_names):
     '''

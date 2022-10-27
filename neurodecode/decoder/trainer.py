@@ -35,19 +35,19 @@ import platform
 import numpy as np
 import multiprocessing as mp
 import sklearn.metrics as skmetrics
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.decoder.features as features
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+import neurodecode.decoder.features as features
 from builtins import input
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from xgboost import XGBClassifier
 from lightgbm import LGBMClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
-from pycnbi.decoder.rlda import rLDA
-from pycnbi import logger
-from pycnbi.triggers.trigger_def import trigger_def
-from pycnbi.gui.streams import redirect_stdout_to_queue
+from neurodecode.decoder.rlda import rLDA
+from neurodecode import logger
+from neurodecode.triggers.trigger_def import trigger_def
+from neurodecode.gui.streams import redirect_stdout_to_queue
 
 # supported classifiers: add this part as you add more classifiers
 CLASSIFIERS = {'RF':RandomForestClassifier, 'GB':GradientBoostingClassifier, 'XGB':XGBClassifier,
@@ -647,7 +647,7 @@ def train_decoder(cfg, featdata, feat_file=None):
         valnorm = values.copy()
         valsum = np.sum(valnorm)
         if valsum > 0:
-            valnorm = valnorm / valsum * 100.0        
+            valnorm = valnorm / valsum * 100.0
 
         # show top-N features
         for i, (ch, hz) in enumerate(zip(chlist, hzlist)):
@@ -670,7 +670,7 @@ def batch_run(cfg_module):
     cfg = check_config(cfg)
     run(cfg, interactive=True)
 
-def run(cfg, state=None, queue=None, interactive=False, cv_file=None, feat_file=None, logger=logger):
+def run(cfg, interactive=False, cv_file=None, feat_file=None, logger=logger):
 
     redirect_stdout_to_queue(logger, queue, 'INFO')
     if state is None:
@@ -680,30 +680,18 @@ def run(cfg, state=None, queue=None, interactive=False, cv_file=None, feat_file=
     cfg.tdef = trigger_def(cfg.TRIGGER_FILE)
 
     # Extract features
-    if not state.value:
-        sys.exit(-1)
     featdata = features.compute_features(cfg)
 
     # Find optimal threshold for TPR balancing
     #balance_tpr(cfg, featdata)
 
     # Perform cross validation
-    if not state.value:
-        sys.exit(-1)
-
     if cfg.CV_PERFORM[cfg.CV_PERFORM['selected']] is not None:
         cross_validate(cfg, featdata, cv_file=cv_file)
 
     # Train a decoder
-    if not state.value:
-        sys.exit(-1)
-
     if cfg.EXPORT_CLS is True:
         train_decoder(cfg, featdata, feat_file=feat_file)
-
-    with state.get_lock():
-        state.value = 0
-
 
 
 if __name__ == '__main__':

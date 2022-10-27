@@ -22,16 +22,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
-import pycnbi
+import neurodecode
 import cv2
 import os
-import pycnbi.utils.q_common as qc
+import neurodecode.utils.q_common as qc
 import numpy as np
 import time
 import serial
 import serial.tools.list_ports
-from pycnbi import logger
-import pycnbi.utils.Motionstim8 as fes
+from neurodecode import logger
+import neurodecode.utils.Motionstim8 as fes
 
 
 # global constants
@@ -58,7 +58,7 @@ class Feedback:
         self.bar_step_up = self.cfg.BAR_STEP['up']
         self.bar_step_down = self.cfg.BAR_STEP['down']
         self.bar_step_both = self.cfg.BAR_STEP['both']
-        
+
         if type(self.cfg.BAR_BIAS) is tuple:
             self.bar_bias = list(self.cfg.BAR_BIAS)
         else:
@@ -97,12 +97,12 @@ class Feedback:
             logger.info('STIMO serial port %s is_open = %s' % (self.stimo_port, self.ser.is_open))
 
         # FES only
-        if self.cfg.WITH_FES is True:       
+        if self.cfg.WITH_FES is True:
             self.stim = fes.Motionstim8()
             self.stim.OpenSerialPort(self.cfg.FES_COMPORT)
             self.stim.InitializeChannelListMode()
             logger.info('Opened FES serial port')
-           
+
 
     def __del__(self):
         # STIMO only
@@ -111,7 +111,7 @@ class Feedback:
             logger.info('Closed STIMO serial port %s' % self.stimo_port)
         # FES only
         if self.cfg.WITH_FES is True:
-            stim_code = [0, 0, 0, 0, 0, 0, 0, 0]                               
+            stim_code = [0, 0, 0, 0, 0, 0, 0, 0]
             self.stim.UpdateChannelSettings(stim_code)
             self.stim.CloseSerialPort()
             logger.info('Closed FES serial port')
@@ -277,21 +277,21 @@ class Feedback:
 
 
                     # FES event mode mode
-                    if self.cfg.WITH_FES is True and self.cfg.FES_CONTINUOUS is False:                                                  
+                    if self.cfg.WITH_FES is True and self.cfg.FES_CONTINUOUS is False:
                         if bar_label == 'L':
-                            stim_code = [0, 30, 0, 0, 0, 0, 0, 0]                               
+                            stim_code = [0, 30, 0, 0, 0, 0, 0, 0]
                             self.stim.UpdateChannelSettings(stim_code)
                             logger.info('FES: Sent Left')
                             time.sleep(0.5)
-                            stim_code = [0, 0, 0, 0, 0, 0, 0, 0] 
+                            stim_code = [0, 0, 0, 0, 0, 0, 0, 0]
                             self.stim.UpdateChannelSettings(stim_code)
 
                         elif bar_label == 'R':
-                            stim_code = [30, 0, 0, 0, 0, 0, 0, 0]                               
+                            stim_code = [30, 0, 0, 0, 0, 0, 0, 0]
                             self.stim.UpdateChannelSettings(stim_code)
                             time.sleep(0.5)
                             logger.info('FES: Sent Right')
-                            stim_code = [0, 0, 0, 0, 0, 0, 0, 0] 
+                            stim_code = [0, 0, 0, 0, 0, 0, 0, 0]
                             self.stim.UpdateChannelSettings(stim_code)
 
 
@@ -417,12 +417,12 @@ class Feedback:
                                     if bar_label == 'L':
                                         stim_code = [bar_score, 0, 0, 0, 0, 0, 0, 0]
                                     else:
-                                        stim_code = [0, bar_score, 0, 0, 0, 0, 0, 0]                               
+                                        stim_code = [0, bar_score, 0, 0, 0, 0, 0, 0]
                                     self.stim.UpdateChannelSettings(stim_code)
                                     logger.info('Sent FES code %d' % bar_score)
                                     self.stimo_timer.reset()
 
-                        
+
 
 
 

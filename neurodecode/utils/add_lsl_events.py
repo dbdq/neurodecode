@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 
-from pycnbi import logger
+from neurodecode import logger
 
 
 def add_lsl_events(event_dir, offset=0, recursive=False, interactive=True):
@@ -28,8 +28,8 @@ def add_lsl_events(event_dir, offset=0, recursive=False, interactive=True):
     Swiss Federal Institute of Technology Lausanne (EPFL)
     2017
     """
-    import pycnbi.utils.q_common as qc
-    from pycnbi.utils.convert2fif import pcl2fif
+    import neurodecode.utils.q_common as qc
+    from neurodecode.utils.convert2fif import pcl2fif
     from builtins import input
 
     offset = float(offset)

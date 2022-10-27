@@ -29,41 +29,35 @@ import traceback
 import subprocess
 import numpy as np
 import pyqtgraph as pg
-import pycnbi
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
+import neurodecode
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
 import multiprocessing as mp
 from PyQt5.QtWidgets import QMainWindow,QApplication, QTableWidgetItem
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPainter
 from pathlib import Path
 from scipy.signal import butter, lfilter, lfiltic, buttord
-from pycnbi.stream_receiver.stream_receiver import StreamReceiver
-from pycnbi.gui.streams import redirect_stdout_to_queue
-from pycnbi import logger
+from neurodecode.stream_receiver.stream_receiver import StreamReceiver
+from neurodecode import logger
 from configparser import RawConfigParser
 from builtins import input
-from pycnbi.stream_viewer.ui_mainwindow_Viewer import Ui_MainWindow
+from neurodecode.stream_viewer.ui_mainwindow_Viewer import Ui_MainWindow
 
 
+# TODO: remove path2_viewerFolder
 # Load GUI. Designed with QT Creator, feel free to change stuff
-path2_viewerFolder = Path(os.environ['PYCNBI_ROOT'])/'pycnbi'/'stream_viewer'
+#path2_viewerFolder = Path(os.environ['PYCNBI_ROOT'])/'pycnbi'/'stream_viewer'
 
 class Scope(QMainWindow):
-    def __init__(self, amp_name, amp_serial, state=mp.Value('i', 1), queue=None):
+    def __init__(self, amp_name, amp_serial):
         super(Scope, self).__init__()
-
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-
-        redirect_stdout_to_queue(logger, queue, 'INFO')
-        logger.info('Viewer launched')
-
         self.amp_name = amp_name
         self.amp_serial = amp_serial
-        self.state = state
-
         self.init_scope()
+        logger.info('Viewer launched')
 
     #
     # 	Main init function
@@ -100,8 +94,9 @@ class Scope(QMainWindow):
             else:
                 self.device_name = ""
                 self.show_channel_names = 0
-        # self.scope_settings.read(os.getenv("HOME") + "/.scope_settings.ini")
-        self.scope_settings.read(str(path2_viewerFolder/'.scope_settings.ini'))
+        #self.scope_settings.read(os.getenv("HOME") + "/.scope_settings.ini")
+        #self.scope_settings.read(str(path2_viewerFolder/'.scope_settings.ini'))
+        self.scope_settings.read('.scope_settings.ini')
 
     #
     # 	Initialize control panel parameter
@@ -421,16 +416,9 @@ class Scope(QMainWindow):
     #	Main update function (connected to the timer)
     #
     def update_loop(self):
-
-        #  Sharing variable to stop at the GUI level
-        if not self.state.value:
-            logger.info('Viewer stopped')
-            sys.exit()
-
         try:
             # assert self.updating==False, 'thread destroyed?'
             # self.updating= True
-
             # self.handle_tobiid_input()	# Read TiDs
             self.read_eeg()  # Read new chunk
             if len(self.ts_list) > 0:
@@ -977,8 +965,6 @@ class Scope(QMainWindow):
         # leeq
         if (self.ui.pushButton_stoprec.isEnabled()):
             subprocess.Popen(["cl_rpc", "closexdf"], close_fds=True)
-        with self.state.get_lock():
-            self.state.value = 0
 
         # ----------------------------------------------------------------------------------------------------
         # 		END OF EVENT HANDLERS

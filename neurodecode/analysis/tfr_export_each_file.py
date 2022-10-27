@@ -17,9 +17,9 @@ import scipy
 import numpy as np
 import mne.time_frequency
 import multiprocessing as mp
-import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.utils.q_common as qc
-from pycnbi import logger
+import neurodecode.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
+from neurodecode import logger
 from builtins import input
 
 def check_cfg(cfg):

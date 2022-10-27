@@ -8,13 +8,12 @@ TODO: merge with parse_features.py to use its API.
 import os
 import sys
 import mne
-import pycnbi
+import neurodecode
 import numpy as np
-import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
 import matplotlib.pyplot as plt
-from pycnbi.pycnbi_config import PYCNBI_ROOT
-from pycnbi import logger
+from neurodecode import logger
 from matplotlib.figure import Figure
 from builtins import input
 
@@ -120,9 +119,7 @@ def feature_importances_topo(featfile, topo_layout_file=None, channels=None, cha
         # set channel locations and reverse lookup table
         chanloc = {}
         if not os.path.exists(topo_layout_file):
-            topo_layout_file = PYCNBI_ROOT + '/layout/' + topo_layout_file
-            if not os.path.exists(topo_layout_file):
-                raise FileNotFoundError('Layout file %s not found.' % topo_layout_file)
+            raise FileNotFoundError('Layout file %s not found.' % topo_layout_file)
         logger.info('Using layout %s' % topo_layout_file)
         for l in open(topo_layout_file):
             token = l.strip().split('\t')

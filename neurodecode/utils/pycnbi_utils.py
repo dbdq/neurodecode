@@ -22,10 +22,10 @@ import importlib
 import numpy as np
 import multiprocessing as mp
 import xml.etree.ElementTree as ET
-import pycnbi.utils.q_common as qc
+import neurodecode.utils.q_common as qc
 from scipy.signal import butter, lfilter, lfiltic, buttord
-from pycnbi.pycnbi_config import CAP, LAPLACIAN
-from pycnbi import logger
+from neurodecode.pycnbi_config import CAP, LAPLACIAN
+from neurodecode import logger
 from builtins import input
 
 mne.set_log_level('ERROR')
@@ -527,23 +527,18 @@ def butter_bandpass(highcut, lowcut, fs, num_ch):
     zi = np.zeros([a.shape[0] - 1, num_ch])
     return b, a, zi
 
-#----------------------------------------------------------------------
-def list_lsl_streams(state=None, logger=logger, ignore_markers=False):
+
+def list_lsl_streams(logger=logger, ignore_markers=False):
     """
+    List available LSL streams found on network
     """
     import time
-    #  GUI sharing variable to stop the process, 1 = start, 0 = stop
-    if not state:
-        state = mp.Value('i', 1)
 
     # look for LSL servers
     amp_list = []
     amp_list_backup = []
 
     while True:
-        #  Stop if recording state (mp shared variable) is set to 0 from GUI
-        if not state.value:
-            sys.exit()
         streamInfos = pylsl.resolve_streams()
         if len(streamInfos) > 0:
             for index, si in enumerate(streamInfos):
@@ -575,10 +570,9 @@ def list_lsl_streams(state=None, logger=logger, ignore_markers=False):
 
 
 
-def search_lsl(state=None, logger=logger, ignore_markers=False):
-
-    #  List the avaiable LSL streams
-    amp_list, streamInfos = list_lsl_streams(state, logger, ignore_markers)
+def search_lsl(logger=logger, ignore_markers=False):
+    #  Find avaiable LSL streams
+    amp_list, streamInfos = list_lsl_streams(logger, ignore_markers)
 
     if len(amp_list) == 1:
         index = 0

@@ -9,8 +9,8 @@ Swiss Federal Institute of Technology of Lausanne (EPFL)
 
 LOG_DIR = r'D:\data\MI\rx1\classifier\gait-ULR-250ms'
 
-import pycnbi
-import pycnbi.utils.q_common as qc
+import neurodecode
+import neurodecode.utils.q_common as qc
 
 dtlist = []
 gtlist = []

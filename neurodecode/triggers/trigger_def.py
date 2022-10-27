@@ -10,9 +10,9 @@ Reads trigger info and creates a class object with the follwing attributes:
 
 import sys
 import os
-import pycnbi.utils.q_common as qc
+import neurodecode.utils.q_common as qc
 from configparser import ConfigParser
-from pycnbi import logger
+from neurodecode import logger
 
 def trigger_def(ini_file, verbose=False):
     class TriggerDef(object):

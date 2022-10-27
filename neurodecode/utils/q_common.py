@@ -31,7 +31,7 @@ import matplotlib.pyplot as plt
 
 # logger
 try:
-    from pycnbi import logger
+    from neurodecode import logger
 except ImportError:
     logging.basicConfig(format='%(msg)s', level='DEBUG')
     logger = logging.getLogger(__name__)

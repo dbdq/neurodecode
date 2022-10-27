@@ -15,10 +15,10 @@ Kyuhwa Lee, 2015
 import time
 import pylsl
 import numpy as np
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
-from pycnbi.triggers.trigger_def import trigger_def
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+from neurodecode.triggers.trigger_def import trigger_def
+from neurodecode import logger
 from builtins import input
 
 def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_start=True, repeat=np.float('inf'), high_resolution=False, trigger_file=None):
@@ -34,9 +34,9 @@ def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_sta
     high_resolution: use perf_counter() instead of sleep() for higher time resolution
                      but uses much more cpu due to polling.
     trigger_file: used to convert event numbers into event strings for readability.
-    
+
     Note: Run pycnbi.set_log_level('DEBUG') to print out the relative time stamps since started.
-    
+
     """
     raw, events = pu.load_raw(fif_file)
     sfreq = raw.info['sfreq']  # sampling frequency

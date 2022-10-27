@@ -8,10 +8,10 @@ Swiss Federal Institute of Technology Lausanne (EPFL)
 import os
 import sys
 import logging
-import pycnbi.colorer
-from pycnbi.utils import q_common as qc
+import neurodecode.colorer
+from neurodecode.utils import q_common as qc
 
-# log level options provided by pycnbi
+# log level options provided by neurodecode
 LOG_LEVELS = {
     'DEBUG':logging.DEBUG,
     'INFO':logging.INFO,
@@ -62,7 +62,7 @@ def init_logger(logger, verbose_console='INFO'):
     '''
     TODO: add file handler
     # file logger handler
-    f_handler = logging.FileHandler('pycnbi.log', mode='a')
+    f_handler = logging.FileHandler('neurodecode.log', mode='a')
     f_handler.setLevel(loglevels[verbose_file])
     f_format = logging.Formatter('%(levelname)s %(asctime)s %(funcName)s:%(lineno)d: %(message)s')
     f_handler.setFormatter(f_format)
@@ -109,11 +109,11 @@ def set_log_level(logger, verbosity, handler_id=0):
 ROOT = qc.parse_path(os.path.realpath(__file__)).dir
 for d in qc.get_dir_list(ROOT):
     if os.path.exists('%s/__init__.py' % d):
-        exe_package = 'import pycnbi.%s' % d.replace(ROOT + '/', '')
+        exe_package = 'import neurodecode.%s' % d.replace(ROOT + '/', '')
         exec(exe_package)
 
 # set loggers
 logging.getLogger('matplotlib').setLevel(logging.ERROR)
-logger = logging.getLogger('pycnbi')
+logger = logging.getLogger('neurodecode')
 logger.propagate = False
 init_logger(logger)

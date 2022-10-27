@@ -10,10 +10,10 @@ Kyuhwa Lee, 2015
 """
 
 import numpy as np
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
-from pycnbi.triggers.trigger_def import trigger_def
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+from neurodecode.triggers.trigger_def import trigger_def
+from neurodecode import logger
 
 def merge_events(trigger_file, events, rawfile_in, rawfile_out):
     tdef = trigger_def(trigger_file)

@@ -12,8 +12,8 @@ Swiss Federal Institute of Technology (EPFL)
 import sys
 import mne
 import numpy as np
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
 from builtins import input
 from IPython import embed
 mne.set_log_level('ERROR')

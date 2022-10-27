@@ -17,10 +17,10 @@ import pylsl
 import ctypes
 import threading
 import multiprocessing as mp
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.cnbi_lsl as cnbi_lsl
-import pycnbi.utils.pycnbi_utils as pu
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.cnbi_lsl as cnbi_lsl
+import neurodecode.utils.pycnbi_utils as pu
+from neurodecode import logger
 from builtins import input, bytes
 
 class Trigger(object):
@@ -123,7 +123,7 @@ class Trigger(object):
             logger.info('Connected to %s.' % com_port)
 
         elif self.lpttype == 'SOFTWARE':
-            from pycnbi.stream_receiver.stream_receiver import StreamReceiver
+            from neurodecode.stream_receiver.stream_receiver import StreamReceiver
             logger.info('Using software trigger')
 
             # get data file location

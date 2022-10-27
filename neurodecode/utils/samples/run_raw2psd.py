@@ -9,8 +9,8 @@ Swiss Federal Institute of Technology (EPFL)
 """
 
 if __name__ == '__main__':
-    import pycnbi
-    import pycnbi.utils.q_common as qc
+    import neurodecode
+    import neurodecode.utils.q_common as qc
     from raw2psd import raw2psd
 
     data_dir = r'D:\data\MI\rx1\offline\gait-pulling\20161104'

@@ -31,16 +31,15 @@ import os
 import sys
 import time
 import random
-import pycnbi
+import neurodecode
 import multiprocessing as mp
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.triggers.pyLptControl as pyLptControl
-from pycnbi.decoder.decoder import BCIDecoderDaemon
-from pycnbi.triggers.trigger_def import trigger_def
-from pycnbi.protocols.feedback import Feedback
-from pycnbi.gui.streams import redirect_stdout_to_queue
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+import neurodecode.triggers.pyLptControl as pyLptControl
+from neurodecode.decoder.decoder import BCIDecoderDaemon
+from neurodecode.triggers.trigger_def import trigger_def
+from neurodecode.protocols.feedback import Feedback
+from neurodecode import logger
 from builtins import input
 
 
@@ -114,30 +113,16 @@ def check_config(cfg):
 
     if getattr(cfg, 'TRIGGER_DEVICE') == None:
         logger.warning('The trigger device is set to None! No events will be saved.')
-        raise RuntimeError('The trigger device is set to None! No events will be saved.')    
+        raise RuntimeError('The trigger device is set to None! No events will be saved.')
 
 # for batch script
-<<<<<<< HEAD:pycnbi/protocols/test_mi.py
-def run(cfg, queue=None):
+def run(cfg):
     qc.print_c('WITH_STIMO = %s' % cfg.WITH_STIMO, 'G')
-=======
-def run(cfg, state=mp.Value('i', 1), queue=None):
-
-    redirect_stdout_to_queue(logger, queue, 'INFO')
-
-    # Wait the recording to start (GUI)
-    while state.value == 2: # 0: stop, 1:start, 2:wait
-        pass
->>>>>>> dev-dbdq:pycnbi/protocols/mi/test_mi.py
-
-    #  Protocol runs if state equals to 1
-    if not state.value:
-        sys.exit(-1)
 
     if cfg.FAKE_CLS is None:
         # chooose amp
         if cfg.AMP_NAME is None and cfg.AMP_SERIAL is None:
-            amp_name, amp_serial = pu.search_lsl(state, ignore_markers=True)
+            amp_name, amp_serial = pu.search_lsl(ignore_markers=True)
         else:
             amp_name = cfg.AMP_NAME
             amp_serial = cfg.AMP_SERIAL
@@ -151,7 +136,7 @@ def run(cfg, state=mp.Value('i', 1), queue=None):
     tdef = trigger_def(cfg.TRIGGER_FILE)
     #if cfg.TRIGGER_DEVICE is None:
     #    input('\n** Warning: No trigger device set. Press Ctrl+C to stop or Enter to continue.')
-    trigger = pyLptControl.Trigger(state, cfg.TRIGGER_DEVICE)
+    trigger = pyLptControl.Trigger(cfg.TRIGGER_DEVICE)
     if trigger.init(50) == False:
         logger.error('Cannot connect to USB2LPT device. Use a mock trigger instead?')
         input('Press Ctrl+C to stop or Enter to continue.')
@@ -192,12 +177,12 @@ def run(cfg, state=mp.Value('i', 1), queue=None):
 
     # bar visual object
     if cfg.FEEDBACK_TYPE == 'BAR':
-        from pycnbi.protocols.viz_bars import BarVisual
+        from neurodecode.protocols.viz_bars import BarVisual
         visual = BarVisual(cfg.GLASS_USE, screen_pos=cfg.SCREEN_POS,
             screen_size=cfg.SCREEN_SIZE)
     elif cfg.FEEDBACK_TYPE == 'BODY':
         assert hasattr(cfg, 'FEEDBACK_IMAGE_PATH'), 'FEEDBACK_IMAGE_PATH is undefined in your config.'
-        from pycnbi.protocols.viz_human import BodyVisual
+        from neurodecode.protocols.viz_human import BodyVisual
         visual = BodyVisual(cfg.FEEDBACK_IMAGE_PATH, use_glass=cfg.GLASS_USE,
             screen_pos=cfg.SCREEN_POS, screen_size=cfg.SCREEN_SIZE)
     visual.put_text('Waiting to start')
@@ -206,7 +191,7 @@ def run(cfg, state=mp.Value('i', 1), queue=None):
         probs_logfile = time.strftime(logdir + "probs-%Y%m%d-%H%M%S.txt", time.localtime())
     else:
         probs_logfile = None
-    feedback = Feedback(cfg, state, visual, tdef, trigger, probs_logfile)
+    feedback = Feedback(cfg, visual, tdef, trigger, probs_logfile)
 
     # start
     trial = 1
@@ -250,7 +235,7 @@ def run(cfg, state=mp.Value('i', 1), queue=None):
                 visual.move(pred_label, 100, overlay=False, barcolor='B')
                 visual.update()
                 logger.info('Executing Rex action %s' % rex_dir)
-                os.system('%s/Rex/RexControlSimple.exe %s %s' % (pycnbi.ROOT, cfg.REX_COMPORT, rex_dir))
+                os.system('%s/Rex/RexControlSimple.exe %s %s' % (neurodecode.ROOT, cfg.REX_COMPORT, rex_dir))
                 time.sleep(8)
 
         if true_label == pred_label:
@@ -277,9 +262,6 @@ def run(cfg, state=mp.Value('i', 1), queue=None):
         print(cfmat)
 
     visual.finish()
-
-    with state.get_lock():
-        state.value = 0
 
     if decoder:
         decoder.stop()

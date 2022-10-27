@@ -28,10 +28,10 @@ import gzip
 import time
 import cv2
 import numpy as np
-import pycnbi
-import pycnbi.glass.bgi_client as bgi_client
-import pycnbi.utils.q_common as qc
-from pycnbi import logger
+import neurodecode
+import neurodecode.glass.bgi_client as bgi_client
+import neurodecode.utils.q_common as qc
+from neurodecode import logger
 from builtins import input
 try:
     import cPickle as pickle  # Python 2 (cPickle = C version of pickle)

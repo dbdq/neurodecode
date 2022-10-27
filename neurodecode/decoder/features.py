@@ -29,18 +29,18 @@ import sys
 import imp
 import mne
 import mne.io
-import pycnbi
+import neurodecode
 import timeit
 import platform
 import traceback
 import numpy as np
 import multiprocessing as mp
 import sklearn.metrics as skmetrics
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
 from mne import Epochs, pick_types
-from pycnbi import logger
-from pycnbi.decoder.rlda import rLDA
+from neurodecode import logger
+from neurodecode.decoder.rlda import rLDA
 from builtins import input
 from IPython import embed  # for debugging
 from sklearn.ensemble import RandomForestClassifier

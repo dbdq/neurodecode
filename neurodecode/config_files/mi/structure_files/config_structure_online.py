@@ -50,7 +50,7 @@ class Basic:
     #-------------------------------------------
     params5 = dict()
     params5.update({'SCREEN_SIZE': ((1920, 1080), (1600, 1200), (1680, 1050), (1280, 1024), (1024, 768))})
-    params5.update({'SCREEN_POS': ((0, 0), (1920, 0))}) # TO CHANGE: add a check box second monitor and auto display on it. 
+    params5.update({'SCREEN_POS': ((0, 0), (1920, 0))}) # TO CHANGE: add a check box second monitor and auto display on it.
 
 
 ########################################################################
@@ -58,13 +58,13 @@ class Advanced:
     """
     Contains the advanced parameters for the training modality of Motor Imagery protocol
     """
-   
+
     #-------------------------------------------
     # Trigger device type
     #-------------------------------------------
     params1 = dict()
     params1.update({'TRIGGER_DEVICE': (None, 'ARDUINO','USB2LPT','SOFTWARE','DESKTOP')})
-    params1.update({'TRIGGER_FILE': str}) # full list: PYCNBI_ROOT/Triggers/triggerdef_*.py
+    params1.update({'TRIGGER_FILE': str}) # full list: /Triggers/triggerdef_*.py
 
     #-------------------------------------------
     # acquisition device (set both to None to search)
@@ -80,7 +80,7 @@ class Advanced:
 
     params3.update({'TIMINGS':dict(INIT=float, GAP=float, READY=float, FEEDBACK=float, DIR_CUE=float, CLASSIFY=float)})
 
-    params4 = dict()    
+    params4 = dict()
     params4.update({'SHOW_CUE': (False, True)})
     params4.update({'SHOW_RESULT': (False, True)})   # show the classification result
     params4.update({'SHOW_TRIALS': (False, True)})
@@ -94,7 +94,7 @@ class Advanced:
     #-------------------------------------------
     # Debug
     #-------------------------------------------
-    params5.update({'DEBUG_PROBS': (False, True)})    
+    params5.update({'DEBUG_PROBS': (False, True)})
     params5.update({'LOG_PROBS': (False, True)})
 
     #-------------------------------------------
@@ -104,4 +104,3 @@ class Advanced:
 
 
 
-    

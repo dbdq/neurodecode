@@ -12,11 +12,11 @@ Swiss Federal Institute of Technology Lausanne (EPFL)
 
 import os
 import sys
-import pycnbi
+import neurodecode
 import scipy.io
 import numpy as np
-from pycnbi import logger
-from pycnbi.utils import q_common as qc
+from neurodecode import logger
+from neurodecode.utils import q_common as qc
 
 def get_feature_scores(featfile, channels=None, freq_ranges=None, matfile=None):
     """

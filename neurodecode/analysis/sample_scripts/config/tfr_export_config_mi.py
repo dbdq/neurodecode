@@ -1,7 +1,7 @@
-import pycnbi
+import neurodecode
 import numpy as np
-import pycnbi.utils.q_common as qc
-from pycnbi.triggers.trigger_def import trigger_def
+import neurodecode.utils.q_common as qc
+from neurodecode.triggers.trigger_def import trigger_def
 
 tdef = trigger_def('triggerdef_16.ini')
 

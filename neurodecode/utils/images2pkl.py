@@ -6,9 +6,9 @@ Compress feedback images into a single pickle object.
 """
 
 import gzip
-import pycnbi.utils.q_common as qc
-from pycnbi.protocols.viz_human import read_images
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+from neurodecode.protocols.viz_human import read_images
+from neurodecode import logger
 try:
     import cPickle as pickle  # Python 2 (cPickle = C version of pickle)
 except ImportError:

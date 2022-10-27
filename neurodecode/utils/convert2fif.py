@@ -28,10 +28,10 @@ import mne
 import pdb
 import scipy.io
 import numpy as np
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
-from pycnbi.pycnbi_config import CAP, LAPLACIAN
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+from neurodecode.pycnbi_config import CAP, LAPLACIAN
+from neurodecode import logger
 from builtins import input
 from pathlib import Path
 

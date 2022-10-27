@@ -30,12 +30,12 @@ import psutil
 import numpy as np
 import multiprocessing as mp
 import multiprocessing.sharedctypes as sharedctypes
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
 from numpy import ctypeslib
-from pycnbi import logger
-from pycnbi.triggers.trigger_def import trigger_def
-from pycnbi.stream_receiver.stream_receiver import StreamReceiver
+from neurodecode import logger
+from neurodecode.triggers.trigger_def import trigger_def
+from neurodecode.stream_receiver.stream_receiver import StreamReceiver
 mne.set_log_level('ERROR')
 os.environ['OMP_NUM_THREADS'] = '1' # actually improves performance for multitaper
 
@@ -416,14 +416,14 @@ class BCIDecoderDaemon(object):
         """
 
         pid = os.getpid()
-        ps = psutil.Process(pid)        
+        ps = psutil.Process(pid)
         if os.name == 'posix':
             # Unix
             ps.nice(0)      # A negative value increases priority but requires root privilages
         else:
             # Windows
             ps.nice(psutil.REALTIME_PRIORITY_CLASS)
-        
+
         logger.debug('[DecodeWorker-%-6d] Decoder worker process started' % (pid))
         decoder = BCIDecoder(classifier, buffer_size=self.buffer_sec, fake=self.fake,\
                              amp_serial=self.amp_serial, amp_name=self.amp_name)
@@ -622,26 +622,26 @@ class BCIDecoderDaemon(object):
 
 
 
-def log_decoding_helper(state, event_queue, amp_name=None, amp_serial=None, autostop=False):
+def log_decoding_helper(do_log, event_queue, amp_name=None, amp_serial=None, autostop=False):
     """
     Helper function to run StreamReceiver object in background
     """
     logger.info('Event acquisition subprocess started.')
 
     # wait for the start signal
-    while state.value == 0:
+    while do_log.value == 0:
         time.sleep(0.01)
-    
+
     # acquire event values and returns event times and event values
     sr = StreamReceiver(buffer_size=0, amp_name=amp_name, amp_serial=amp_serial)
     tm = qc.Timer(autoreset=True)
     started = False
-    while state.value == 1:
+    while do_log.value == 1:
         chunk, ts_list = sr.acquire()
         if autostop:
             if started is True:
                 if len(ts_list) == 0:
-                    state.value = 0
+                    do_log.value = 0
                     break
             elif len(ts_list) > 0:
                 started = True
@@ -677,9 +677,9 @@ def log_decoding(decoder, logfile, amp_name=None, amp_serial=None, pklfile=True,
     import scipy
 
     # run event acquisition process in the background
-    state = mp.Value('i', 1)
+    do_log = mp.Value('i', 1)
     event_queue = mp.Queue()
-    proc = mp.Process(target=log_decoding_helper, args=[state, event_queue, amp_name, amp_serial, autostop])
+    proc = mp.Process(target=log_decoding_helper, args=[do_log, event_queue, amp_name, amp_serial, autostop])
     proc.start()
     logger.info_green('Spawned event acquisition process.')
 
@@ -691,7 +691,7 @@ def log_decoding(decoder, logfile, amp_name=None, amp_serial=None, pklfile=True,
         decode_fn = decoder.get_prob_smooth_unread
     else:
         decode_fn = decoder.get_prob_unread
-        
+
     # simple controller UI
     cv2.namedWindow("Decoding", cv2.WINDOW_AUTOSIZE)
     cv2.moveWindow("Decoding", 1400, 50)
@@ -733,7 +733,7 @@ def log_decoding(decoder, logfile, amp_name=None, amp_serial=None, pklfile=True,
     # finish up processes
     cv2.destroyAllWindows()
     logger.info('Cleaning up event acquisition process.')
-    state.value = 0
+    do_log.value = 0
     decoder.stop()
     event_times, event_values = event_queue.get()
     proc.join()

@@ -21,14 +21,14 @@ TMIN = 0.0
 TMAX = 2.0
 
 
-import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
 import scipy.io
 import mne
 import numpy as np
 import trainer
 from multiprocessing import cpu_count
-from pycnbi import logger
+from neurodecode import logger
 
 mne.set_log_level('ERROR')
 

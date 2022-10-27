@@ -19,10 +19,10 @@ import numpy as np
 import multiprocessing as mp
 import mne.time_frequency
 import matplotlib.pyplot as plt
-import pycnbi.utils.pycnbi_utils as pu
-import pycnbi.utils.q_common as qc
-from pycnbi.triggers.trigger_def import trigger_def
-from pycnbi import logger
+import neurodecode.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
+from neurodecode.triggers.trigger_def import trigger_def
+from neurodecode import logger
 from builtins import input
 from scipy.signal import lfilter
 from scipy.signal import butter

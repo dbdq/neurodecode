@@ -13,10 +13,10 @@ Created on Mon Oct 05 10:02:22 2015
 import h5py
 import scipy.io
 import numpy as np
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
 import xml.etree.ElementTree as XET  # xml parser
-from pycnbi import logger
+from neurodecode import logger
 
 def hdf5_to_python(data_dir):
     for rawfile in qc.get_file_list(data_dir, fullpath=True):

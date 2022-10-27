@@ -8,9 +8,9 @@ Export fif data into mat files.
 import os
 import mne
 import scipy.io
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
+from neurodecode import logger
 
 def fif2mat_file(fif_file, out_dir='./'):
     raw, events = pu.load_raw(fif_file)

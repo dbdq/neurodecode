@@ -12,8 +12,8 @@ i7-8700K: 9.9 ms (101.0 Hz)
 import os
 import mne
 import numpy as np
-import pycnbi.utils.q_common as qc
-from pycnbi import logger
+import neurodecode.utils.q_common as qc
+from neurodecode import logger
 
 os.environ['OMP_NUM_THREADS'] = '1' # actually improves performance for multitaper
 

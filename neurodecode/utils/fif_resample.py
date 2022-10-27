@@ -10,10 +10,10 @@ Swiss Federal Institute of Technology (EPFL)
 """
 
 import sys
-import pycnbi.utils.q_common as qc
-import pycnbi.utils.pycnbi_utils as pu
+import neurodecode.utils.q_common as qc
+import neurodecode.utils.pycnbi_utils as pu
 from builtins import input
-from pycnbi import logger
+from neurodecode import logger
 
 def fif_resample(fif_dir, sfreq_target):
     out_dir = fif_dir + '/fif_resample%d' % sfreq_target

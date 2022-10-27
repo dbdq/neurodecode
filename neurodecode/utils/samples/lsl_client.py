@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 
-import pycnbi
-import pycnbi.utils.cnbi_lsl as cnbi_lsl
+import neurodecode
+import neurodecode.utils.cnbi_lsl as cnbi_lsl
 import time
 
 LSL_SERVER = 'RexController'

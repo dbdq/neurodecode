@@ -1,5 +1,5 @@
-import pycnbi
-import pycnbi.utils.q_common as qc
+import neurodecode
+import neurodecode.utils.q_common as qc
 from epochs2psd import epochs2psd
 
 # parameters
@@ -11,7 +11,7 @@ fmin = 1
 fmax = 40
 w_len = 0.5
 w_step = 16
-from pycnbi.triggers.trigger_def import trigger_def
+from neurodecode.triggers.trigger_def import trigger_def
 
 tdef = trigger_def('triggerdef_16.ini')
 events = {'left':tdef.LEFT_GO, 'right':tdef.RIGHT_GO}

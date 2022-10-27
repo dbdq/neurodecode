@@ -35,8 +35,8 @@ multiplier = 1
 
 # code begins
 from mne.decoding import PSDEstimator
-from pycnbi.stream_receiver.stream_receiver import StreamReceiver
-import pycnbi.utils.pycnbi_utils as pu
+from neurodecode.stream_receiver.stream_receiver import StreamReceiver
+import neurodecode.utils.pycnbi_utils as pu
 import numpy as np
 import cv2
 import mne

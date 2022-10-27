@@ -134,9 +134,15 @@ def config_run(cfg_module):
         cfg.TFR_TYPE = 'multitaper'
     get_tfr_each_file(cfg, tfr_type=cfg.TFR_TYPE)
 
-if __name__ == '__main__':
+def main():
+    """
+    Invoked from console
+    """
     if len(sys.argv) < 2:
         cfg_module = input('Config module name? ')
     else:
         cfg_module = sys.argv[1]
     config_run(cfg_module)
+
+if __name__ == '__main__':
+    main()

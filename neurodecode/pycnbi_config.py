@@ -1,5 +1,5 @@
 """
-PyCNBI global configurations
+Neurodeocde global configurations
 
 Kyuhwa Lee, 2014
 

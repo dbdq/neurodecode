@@ -12,6 +12,7 @@ Kyuhwa Lee, 2015
 
 """
 
+import sys
 import time
 import pylsl
 import numpy as np
@@ -131,10 +132,29 @@ def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_sta
                 logger.info('Reached the end of data.')
                 break
 
-# sample code
-if __name__ == '__main__':
+
+def main():
+    """
+    Invoked from console
+    """
+    if len(sys.argv) < 3:
+        print('Usage: {fif_file} {chunk_size} [server_name=StreamPlayer]')
+        return
+    else:
+        fif_file = sys.argv[1]
+        chunk_size = int(sys.argv[2])
+        if len(sys.argv) >= 4:
+            server_name = sys.argv[3]
+        else:
+            server_name = 'StreamPlayer'
+    stream_player(server_name, fif_file, chunk_size)
+
+def sample_code():
     server_name = 'StreamPlayer'
     chunk_size = 8
     fif_file = '../../mi_left_right.fif'
     stream_player(server_name, fif_file, chunk_size)
 
+# sample code
+if __name__ == '__main__':
+    main()

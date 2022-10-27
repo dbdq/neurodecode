@@ -164,13 +164,18 @@ def config_run(featfile=None, topo_layout_file=None):
     if topo_layout_file is None or len(topo_layout_file.strip()) == 0:
         topo_layout_file = 'antneuro_64ch.lay'
 
-    feature_importances(featfile, topo_layout_file)
+    feature_importances_topo(featfile, topo_layout_file)
 
-# sample code
-if __name__ == '__main__':
+def main():
+    """
+    Invoked from the console
+    """
     if len(sys.argv) > 2:
         config_run(sys.argv[1], sys.argv[2])
     elif len(sys.argv) > 1:
         config_run(sys.argv[1])
     else:
         config_run()
+
+if __name__ == '__main__':
+    main()

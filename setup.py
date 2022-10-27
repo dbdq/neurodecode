@@ -1,8 +1,13 @@
 import os
+import sys
 from setuptools import find_packages, setup
 
+# backward compatibility for old pycnbi users
 if not os.path.exists('./pycnbi'):
-    os.symlink('./neurodecode', './pycnbi', True)
+    if sys.platform.startswith('win'):
+        os.system('mklink pycnbi neurodecode /J')
+    else:
+        os.symlink('./neurodecode', './pycnbi', True)
 
 setup(
     name='neurodecode',
@@ -15,6 +20,7 @@ setup(
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     packages=find_packages(),
+    package_data={'neurodecode.stream_viewer':['*.ini']},
     install_requires=[
         'h5py>=2.7',
         'opencv_python>=3.4',
@@ -39,5 +45,21 @@ setup(
         'lightgbm>=2.3',
         'mat73'
     ],
-    scripts=[]
+    entry_points = {'console_scripts':[
+        'nd_stream_viewer=neurodecode.stream_viewer.stream_viewer:main',
+        'nd_fif_info=neurodecode.utils.fif_info:main',
+        'nd_fif_resample=neurodecode.utils.fif_resample:main',
+        'nd_fif2mat=neurodecode.utils.fif2mat:main',
+        'nd_add_lsl_events=neurodecode.utils.add_lsl_events:main',
+        'nd_parse_features=neurodecode.utils.parse_features:main',
+        'nd_convert2fif=neurodecode.utils.convert2fif:main',
+        'nd_train_mi=neurodecode.protocols.mi.train_mi:main',
+        'nd_test_mi=neurodecode.protocols.mi.test_mi:main',
+        'nd_stream_player=neurodecode.stream_player.stream_player:main',
+        'nd_stream_recorder=neurodecode.stream_recorder.stream_recorder:main',
+        'nd_tfr_export=neurodecode.analysis.tfr_export:main',
+        'nd_tfr_export_each_file=neurodecode.analysis.tfr_export_each_file:main',
+        'nd_trainer=neurodecode.decoder.trainer:main',
+        'nd_feature_importance_topo=neurodecode.analysis.feature_importances_topo:main'
+    ]}
 )

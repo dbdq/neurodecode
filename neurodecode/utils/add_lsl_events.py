@@ -1,7 +1,7 @@
 from __future__ import print_function, division
 
+import sys
 from neurodecode import logger
-
 
 def add_lsl_events(event_dir, offset=0, recursive=False, interactive=True):
     """
@@ -34,7 +34,7 @@ def add_lsl_events(event_dir, offset=0, recursive=False, interactive=True):
 
     offset = float(offset)
     if offset != 0:
-        logger.info_yellow('Time offset = %.3f' % offset)
+        logger.info('Time offset = %.3f' % offset)
     to_process = []
     logger.info('Files to be processed')
     if recursive:
@@ -55,8 +55,23 @@ def add_lsl_events(event_dir, offset=0, recursive=False, interactive=True):
         pclfile = f.replace('-eve.txt', '-raw.pcl')
         pcl2fif(pclfile, external_event=f, offset=offset, overwrite=True)
 
-# sample code
-if __name__ == '__main__':
+
+def main():
+    """
+    Invoked from console
+    """
+    if len(sys.argv) < 3:
+        event_dir = input('Events file directory? ')
+        offset = float(input('Offset in seconds? '))
+    else:
+        event_dir = sys.argv[1]
+        offset = sys.argv[2]
+    add_lsl_events(event_dir, offset=offset, recursive=False)
+
+def sample_code():
     event_dir = r'D:\data\Records'
     offset = -0.093936
     add_lsl_events(event_dir, offset=offset, recursive=False)
+
+if __name__ == '__main__':
+    main()

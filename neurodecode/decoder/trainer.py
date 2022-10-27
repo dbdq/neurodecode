@@ -693,13 +693,17 @@ def run(cfg, interactive=False, cv_file=None, feat_file=None, logger=logger):
     if cfg.EXPORT_CLS is True:
         train_decoder(cfg, featdata, feat_file=feat_file)
 
-
-if __name__ == '__main__':
+def main():
+    """
+    Invoked from console
+    """
     # Load parameters
     if len(sys.argv) < 2:
         cfg_module = input('Config module name? ')
     else:
         cfg_module = sys.argv[1]
     batch_run(cfg_module)
-
     logger.info('Finished.')
+
+if __name__ == '__main__':
+    main()

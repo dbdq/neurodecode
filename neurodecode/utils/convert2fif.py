@@ -527,7 +527,19 @@ def saveChannels2txt(outdir, ch_names):
         file.close()
 
 
-def main(input_dir, channel_file=None):
+def main():
+    """
+    Invoked from the console
+    """
+    if len(sys.argv) == 1:
+        input_dir = [input('Input directory? ')]
+    else:
+        input_dir = sys.argv[1]
+        if len(sys.argv) >= 3:
+            channel_file = sys.argv[2]
+        else:
+            channel_file = None
+
     count = 0
     for f in qc.get_file_list(input_dir, fullpath=True, recursive=True):
         p = qc.parse_path(f)
@@ -540,12 +552,4 @@ def main(input_dir, channel_file=None):
     logger.info('%d files converted.' % count)
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        input_dir = [input('Input directory? ')]
-    else:
-        input_dir = sys.argv[1]
-        if len(sys.argv) >= 3:
-            channel_file = sys.argv[2]
-        else:
-            channel_file = None
-    main(input_dir, channel_file)
+    main()

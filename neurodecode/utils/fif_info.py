@@ -35,9 +35,16 @@ def batch_run(fif_file=None):
         fif_file = input('fif file name?')
     run(fif_file)
 
-# invoked directly from console
-if __name__ == '__main__':
-    fif_file = None
+def main():
+    """
+    Invoked from console
+    """
     if len(sys.argv) >= 2:
         fif_file = sys.argv[1]
+    else:
+        fif_file = None
     batch_run(fif_file)
+
+
+if __name__ == '__main__':
+    main()

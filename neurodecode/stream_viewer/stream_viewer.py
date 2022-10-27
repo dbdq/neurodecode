@@ -18,7 +18,6 @@ from __future__ import print_function, division, unicode_literals
 DEBUG_TRIGGER = False # TODO: parameterize
 NUM_X_CHANNELS = 16 # TODO: parameterize
 
-
 import os
 import sys
 import pdb
@@ -37,11 +36,11 @@ from PyQt5.QtWidgets import QMainWindow,QApplication, QTableWidgetItem
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPainter
 from pathlib import Path
+from importlib.resources import files
 from scipy.signal import butter, lfilter, lfiltic, buttord
 from neurodecode.stream_receiver.stream_receiver import StreamReceiver
 from neurodecode import logger
 from configparser import RawConfigParser
-from builtins import input
 from neurodecode.stream_viewer.ui_mainwindow_Viewer import Ui_MainWindow
 
 
@@ -94,9 +93,12 @@ class Scope(QMainWindow):
             else:
                 self.device_name = ""
                 self.show_channel_names = 0
-        #self.scope_settings.read(os.getenv("HOME") + "/.scope_settings.ini")
-        #self.scope_settings.read(str(path2_viewerFolder/'.scope_settings.ini'))
-        self.scope_settings.read('.scope_settings.ini')
+
+        scope_setting_file = files('neurodecode.stream_viewer').joinpath('scope_settings.ini')
+        read_ok = self.scope_settings.read(scope_setting_file)
+        if len(read_ok) == 0:
+            logger.error('Cannot read scope setting file')
+            raise FileNotFoundError(scope_setting_file)
 
     #
     # 	Initialize control panel parameter
@@ -177,7 +179,7 @@ class Scope(QMainWindow):
         self.bool_parser = {True:'1', False:'0'}
 
         # PyQTGraph plot initialization
-        self.win = pg.GraphicsWindow()
+        self.win = pg.GraphicsLayoutWidget()
         self.win.setWindowTitle('EEG Scope')
         self.win.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint)
         self.win.keyPressEvent = self.keyPressEvent
@@ -353,10 +355,10 @@ class Scope(QMainWindow):
         self.tri = np.zeros(self.config['samples'])
         self.eeg = np.zeros(
             (self.config['samples'], self.config['eeg_channels']),
-            dtype=np.float)
+            dtype=float)
         self.exg = np.zeros(
             (self.config['samples'], self.config['exg_channels']),
-            dtype=np.float)
+            dtype=float)
 
         # TID initialization
         self.bci = BCI.BciInterface()
@@ -389,10 +391,10 @@ class Scope(QMainWindow):
         self.last_tri = 0
         self.eeg = np.zeros(
             (self.config['samples'], self.config['eeg_channels']),
-            dtype=np.float)
+            dtype=float)
         self.exg = np.zeros(
             (self.config['samples'], self.config['exg_channels']),
-            dtype=np.float)
+            dtype=float)
         self.ts_list = []
         self.ts_list_tri = []
 
@@ -971,7 +973,10 @@ class Scope(QMainWindow):
         # ----------------------------------------------------------------------------------------------------
 
 
-if __name__ == '__main__':
+def main():
+    """
+    Invoked from console
+    """
     if len(sys.argv) == 2:
         amp_name = sys.argv[1]
         amp_serial = None
@@ -986,3 +991,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = Scope(amp_name, amp_serial)
     sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    main()

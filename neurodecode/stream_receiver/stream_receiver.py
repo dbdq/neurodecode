@@ -187,7 +187,7 @@ class StreamReceiver:
             logger.warning('Trigger channel not fonud. Adding an empty channel 0.')
         else:
             if self._lsl_tr_channel != 0:
-                logger.info_yellow('Trigger channel found at index %d. Moving to index 0.' % self._lsl_tr_channel)
+                logger.info('Trigger channel found at index %d. Moving to index 0.' % self._lsl_tr_channel)
             self._lsl_eeg_channels.pop(self._lsl_tr_channel)
         self._lsl_eeg_channels = np.array(self._lsl_eeg_channels)
         self.tr_channel = 0  # trigger channel is always set to 0.

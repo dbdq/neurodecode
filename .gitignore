@@ -1,13 +1,12 @@
-pycnbi/glass/bgi-cnbi/app/build
-pycnbi/glass/bgi-cnbi/build
-pycnbi/build
+pycnbi
+neurodecode/glass/bgi-cnbi/app/build
+neurodecode/glass/bgi-cnbi/build
+neurodecode/build
 build
 obj
 __pycache__
 .DS_Store
 .idea
-pycnbi_project.wpr
-pycnbi_project.wpu
 *.egg-info
 *.egg
 *.asv

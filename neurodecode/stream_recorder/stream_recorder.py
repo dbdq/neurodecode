@@ -39,16 +39,12 @@ import neurodecode.utils.q_common as qc
 import neurodecode.utils.pycnbi_utils as pu
 from neurodecode.utils.convert2fif import pcl2fif
 from neurodecode.utils.cnbi_lsl import start_server
-from neurodecode.gui.streams import redirect_stdout_to_queue
 from neurodecode.stream_receiver.stream_receiver import StreamReceiver
 from neurodecode import logger
 from builtins import input
 
 
-def record(recordState, amp_name, amp_serial, record_dir, eeg_only, recordLogger=logger, queue=None):
-
-    redirect_stdout_to_queue(recordLogger, queue, 'INFO')
-
+def record(record_state, amp_name, amp_serial, record_dir, eeg_only, recordLogger=logger):
     # set data file name
     timestamp = time.strftime('%Y%m%d-%H%M%S', time.localtime())
     pcl_file = "%s/%s-raw.pcl" % (record_dir, timestamp)
@@ -74,7 +70,7 @@ def record(recordState, amp_name, amp_serial, record_dir, eeg_only, recordLogger
     qc.print_c('\n>> Press Enter to stop recording', 'G')
     tm = qc.Timer(autoreset=True)
     next_sec = 1
-    while recordState.value == 1:
+    while record_state.value == 1:
         sr.acquire()
         if sr.get_buflen() > next_sec:
             duration = str(datetime.timedelta(seconds=int(sr.get_buflen())))
@@ -104,21 +100,21 @@ def record(recordState, amp_name, amp_serial, record_dir, eeg_only, recordLogger
     recordLogger.info('Converting raw file into fif.')
     pcl2fif(pcl_file, external_event=eve_file)
 
-def run(record_dir, amp_name, amp_serial, eeg_only=False, queue=None):
+def run(record_dir, amp_name, amp_serial, eeg_only=False):
     recordLogger = logger
     recordLogger.info('\nOutput directory: %s' % (record_dir))
 
     # spawn the recorder as a child process
     recordLogger.info('\n>> Press Enter to start recording.')
     key = input()
-    recordState = mp.Value('i', 1)
-    proc = mp.Process(target=record, args=[recordState, amp_name, amp_serial, record_dir, eeg_only])
+    record_state = mp.Value('i', 1)
+    proc = mp.Process(target=record, args=[record_state, amp_name, amp_serial, record_dir, eeg_only])
     proc.start()
 
     # clean up
     time.sleep(1) # required on some Python distribution
     input()
-    recordState.value = 0
+    record_state.value = 0
     recordLogger.info('(main) Waiting for recorder process to finish.')
     proc.join(10)
     if proc.is_alive():
@@ -137,19 +133,16 @@ def batch_run(record_dir=None, amp_name=None, amp_serial=None):
         amp_name, amp_serial = pu.search_lsl(ignore_markers=True)
     run(record_dir, amp_name=amp_name, amp_serial=amp_serial)
 
-def run_gui(recordState, protocolState, record_dir, recordLogger=logger, amp_name=None, amp_serial=None, eeg_only=False, queue=None):
-
-    redirect_stdout_to_queue(recordLogger, queue, 'INFO')
-
+def run_gui(record_state, protocolState, record_dir, recordLogger=logger, amp_name=None, amp_serial=None, eeg_only=False):
     # configure LSL server name and device serial if available
     if not amp_name:
-        amp_name, amp_serial = pu.search_lsl(recordState, recordLogger, ignore_markers=True)
+        amp_name, amp_serial = pu.search_lsl(record_state, recordLogger, ignore_markers=True)
 
     recordLogger.info('\nOutput directory: %s' % (record_dir))
 
     # spawn the recorder as a child process
     recordLogger.info('\n>> Recording started.')
-    proc = mp.Process(target=record, args=[recordState, amp_name, amp_serial, record_dir, eeg_only, recordLogger, queue])
+    proc = mp.Process(target=record, args=[record_state, amp_name, amp_serial, record_dir, eeg_only, recordLogger])
     proc.start()
 
     # Launching the protocol (shared variable)
@@ -157,7 +150,7 @@ def run_gui(recordState, protocolState, record_dir, recordLogger=logger, amp_nam
         protocolState.value = 1
 
     # Continue recording until the shared variable changes to 0.
-    while recordState.value:
+    while record_state.value:
         time.sleep(1)
 
     recordLogger.info('(main) Waiting for recorder process to finish.')
@@ -169,9 +162,10 @@ def run_gui(recordState, protocolState, record_dir, recordLogger=logger, amp_nam
     sys.stdout.flush()
     recordLogger.info('Recording finished.')
 
-
-# default sample recorder
-if __name__ == '__main__':
+def main():
+    """
+    Invoked from console
+    """
     record_dir = None
     amp_name = None
     amp_serial = None
@@ -182,3 +176,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         record_dir = sys.argv[1]
     batch_run(record_dir, amp_name, amp_serial)
+
+# default sample recorder
+if __name__ == '__main__':
+    main()

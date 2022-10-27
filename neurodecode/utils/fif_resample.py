@@ -38,8 +38,10 @@ def batch_run(fif_dir=None, sfreq_target=None):
     sfreq_target = float(sfreq_target)
     fif_resample(fif_dir, sfreq_target)
 
-# invoked directly from console
-if __name__ == '__main__':
+def main():
+    """
+    Invoked from console
+    """
     if len(sys.argv) < 3:
         fif_dir = input('Data file path? ')
         sfreq_target = float(input('Target sampling frequency? '))
@@ -47,4 +49,7 @@ if __name__ == '__main__':
         fif_dir = sys.argv[1]
         sfreq_target = float(sys.argv[2])
     fif_resample(fif_dir, sfreq_target)
-    print('Finished.')
+    logger.info('Finished.')
+
+if __name__ == '__main__':
+    main()

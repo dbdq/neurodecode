@@ -303,9 +303,15 @@ def batch_run(cfg_module):
     check_config(cfg)
     run(cfg)
 
-if __name__ == '__main__':
+def main():
+    """
+    Invoked from console
+    """
     if len(sys.argv) < 2:
         cfg_module = input('Config module name? ')
     else:
         cfg_module = sys.argv[1]
     batch_run(cfg_module)
+
+if __name__ == '__main__':
+    main()

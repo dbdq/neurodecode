@@ -6,6 +6,7 @@ Export fif data into mat files.
 """
 
 import os
+import sys
 import mne
 import scipy.io
 import neurodecode.utils.q_common as qc
@@ -42,7 +43,15 @@ def fif2mat(input_path):
         raise ValueError('Neither directory nor file: %s' % input_path)
     logger.info('Finished.')
 
+def main():
+    """
+    Invoked from console
+    """
+    if len(sys.argv) < 3:
+        fif_dir = input('fif directory? ')
+    else:
+        fif_dir = sys.argv[1]
+    fif2mat(fif_dir)
+
 if __name__ == '__main__':
-    # path to fif file(s)
-    input_path = r'D:\data\Records\fif'
-    fif2mat(input_path)
+    main()

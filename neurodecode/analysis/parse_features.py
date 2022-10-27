@@ -163,8 +163,9 @@ def config_run(featfile=None):
             featfile = input('Feature file path? ')
     feature_info(featfile)
 
+
 # sample code
-if __name__ == '__main__':
+def sample_code():
     FEATFILE = r'D:\data\MI\z2\LR\classifier\good_features.txt'
     CHANNELS = ['C3', 'C4', 'Cz']
     FREQ_RANGES = dict(
@@ -176,3 +177,16 @@ if __name__ == '__main__':
     #MATFILE = '%s/good_features.mat' % qc.parse_path(FEATFILE).dir
     MATFILE = None
     feature_info(FEATFILE, CHANNELS, FREQ_RANGES, MATFILE)
+
+def main():
+    """
+    Invoked from console
+    """
+    if len(sys.argv) >= 2:
+        featfile = sys.argv[1]
+    else:
+        featfile = None
+    config_run(featfile)
+
+if __name__ == '__main__':
+    main()

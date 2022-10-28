@@ -9,6 +9,7 @@ Kyuhwa Lee
 Swiss Federal Institute of Technology (EPFL)
 """
 
+import os
 import sys
 import mne
 import numpy as np
@@ -30,19 +31,18 @@ def run(fif_file):
     embed()
 
 # for batch scripts
-def batch_run(fif_file=None):
-    if not fif_file:
-        fif_file = input('fif file name?')
+def batch_run(fif_file):
     run(fif_file)
 
 def main():
     """
     Invoked from console
     """
-    if len(sys.argv) >= 2:
-        fif_file = sys.argv[1]
-    else:
-        fif_file = None
+    if len(sys.argv) == 1:
+        print('Usage: %s fif_file' % os.path.basename(__file__))
+        return
+
+    fif_file = sys.argv[1]
     batch_run(fif_file)
 
 

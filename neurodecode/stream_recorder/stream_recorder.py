@@ -133,6 +133,7 @@ def batch_run(record_dir=None, amp_name=None, amp_serial=None):
         amp_name, amp_serial = pu.search_lsl(ignore_markers=True)
     run(record_dir, amp_name=amp_name, amp_serial=amp_serial)
 
+# backup: for invoking from GUI
 def run_gui(record_state, protocolState, record_dir, recordLogger=logger, amp_name=None, amp_serial=None, eeg_only=False):
     # configure LSL server name and device serial if available
     if not amp_name:

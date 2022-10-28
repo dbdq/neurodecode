@@ -1,5 +1,5 @@
-The subject was trained using two motor imagery (MI) tasks: left and right hand MI.
-RIGHT_GO (event 9) and LEFT_GO (event 11) denote the onset of MI, which lasts for about 5 seconds.
+;The subject was trained using two motor imagery (MI) tasks: left and right hand MI.
+;RIGHT_GO (event 9) and LEFT_GO (event 11) denote the onset of MI, which lasts for about 5 seconds.
 
 [events]
 INIT = 15            ; start of the trial

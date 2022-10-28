@@ -9,6 +9,7 @@ Swiss Federal Institute of Technology (EPFL)
 
 """
 
+import os
 import sys
 import neurodecode.utils.q_common as qc
 import neurodecode.utils.pycnbi_utils as pu
@@ -43,11 +44,11 @@ def main():
     Invoked from console
     """
     if len(sys.argv) < 3:
-        fif_dir = input('Data file path? ')
-        sfreq_target = float(input('Target sampling frequency? '))
-    else:
-        fif_dir = sys.argv[1]
-        sfreq_target = float(sys.argv[2])
+        print('Usage: %s fif_dir target_sfreq' % os.path.basename(__file__))
+        return
+
+    fif_dir = sys.argv[1]
+    sfreq_target = float(sys.argv[2])
     fif_resample(fif_dir, sfreq_target)
     logger.info('Finished.')
 

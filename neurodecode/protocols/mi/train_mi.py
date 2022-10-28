@@ -34,7 +34,6 @@ from neurodecode.protocols.viz_bars import BarVisual
 from neurodecode.triggers.trigger_def import trigger_def
 from neurodecode import logger
 from builtins import input
-from neurodecode.gui.streams import redirect_stdout_to_queue
 
 def check_config(cfg):
     critical_vars = {
@@ -232,10 +231,11 @@ def main():
     """
     Invoked from console
     """
-    if len(sys.argv) < 2:
-        cfg_module = input('Config module name? ')
-    else:
-        cfg_module = sys.argv[1]
+    if len(sys.argv) == 1:
+        print('Usage: %s config_module' % os.path.basename(__file__))
+        return
+
+    cfg_module = sys.argv[1]
     batch_run(cfg_module)
 
 if __name__ == '__main__':

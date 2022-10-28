@@ -780,9 +780,9 @@ def check_speed(decoder, max_count=float('inf')):
     print('mean = %.1f ms' % np.mean(mslist))
 
 
-def sample_decoding(decoder):
+def simple_decoding(decoder):
     """
-    Decoding example
+    Simple decoding example
     """
     # load trigger definitions for labeling
     labels = decoder.get_label_names()
@@ -807,35 +807,43 @@ def sample_decoding(decoder):
         print(txt)
         tm_cls.reset()
 
-# sample code
 if __name__ == '__main__':
-    model_file = r'D:\data\STIMO_EEG\DM002\offline\all\classifier_L_vs_Feedback\classifier-64bit.pkl'
+    main()
 
-    if len(sys.argv) == 2:
-        amp_name = sys.argv[1]
-        amp_serial = None
-    elif len(sys.argv) == 3:
-        amp_name, amp_serial = sys.argv[1:3]
-    else:
+
+# sample code
+def main():
+    if len(sys.argv) == 1:
+        print('Usage: %s model_file [amp_name] [amp_serial]' % os.path.basename(__file__))
+        return
+
+    model_file = sys.argv[1]
+    amp_name = amp_serial = None
+    if len(sys.argv) > 2:
+        amp_name = sys.argv[2]
+    if len(sys.argv) > 3:
+        amp_serial = sys.argv[3]
+    if amp_name is None:
         amp_name, amp_serial = pu.search_lsl(ignore_markers=True)
-    if amp_name == 'None':
-        amp_name = None
     logger.info('Connecting to a server %s (Serial %s).' % (amp_name, amp_serial))
 
-    # run on background
+    # run decoder on background (standard mode)
     parallel = None # no process interleaving
     #parallel = dict(period=0.06, num_strides=3)
     decoder = BCIDecoderDaemon(model_file, buffer_size=1.0, fake=False, amp_name=amp_name,\
         amp_serial=amp_serial, parallel=parallel, alpha_new=0.1)
 
-    # run on foreground
+    # run decoder on foreground (for debugging)
     #decoder = BCIDecoder(model_file, buffer_size=1.0, amp_name=amp_name, amp_serial=amp_serial)
 
-    # run a fake classifier on background
+    # run a fake decoder on background (for testing)
     #decoder= BCIDecoderDaemon(fake=True, fake_dirs=['L','R'])
 
-    check_speed(decoder, 5000)
+    # measure the decoding speed
+    #check_speed(decoder, 5000)
 
-    #sample_decoding(decoder)
+    # do simple decoding and print out the probabilities
+    simple_decoding(decoder)
 
+    # stop the decoder
     decoder.stop()

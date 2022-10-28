@@ -43,11 +43,6 @@ from neurodecode import logger
 from configparser import RawConfigParser
 from neurodecode.stream_viewer.ui_mainwindow_Viewer import Ui_MainWindow
 
-
-# TODO: remove path2_viewerFolder
-# Load GUI. Designed with QT Creator, feel free to change stuff
-#path2_viewerFolder = Path(os.environ['PYCNBI_ROOT'])/'pycnbi'/'stream_viewer'
-
 class Scope(QMainWindow):
     def __init__(self, amp_name, amp_serial):
         super(Scope, self).__init__()
@@ -947,9 +942,6 @@ class Scope(QMainWindow):
         if ((key >= QtCore.Qt.Key_0) and (key <= QtCore.Qt.Key_9)):
             if (self.show_Key_events) and (not self.stop_plot):
                 self.addEventPlot("KEY", 990 + key - QtCore.Qt.Key_0)
-                # self.bci.id_msg_bus.SetEvent(990 + key - QtCore.Qt.Key_0)
-                # self.bci.iDsock_bus.sendall(self.bci.id_serializer_bus.Serialize());
-                # 666
 
     #
     #	Function called when a closing event was triggered.
@@ -977,19 +969,16 @@ def main():
     """
     Invoked from console
     """
-    if len(sys.argv) == 2:
-        amp_name = sys.argv[1]
-        amp_serial = None
-    elif len(sys.argv) == 3:
-        amp_name, amp_serial = sys.argv[1:3]
-    else:
+    if len(sys.argv) == 1:
         amp_name, amp_serial = pu.search_lsl()
-    if amp_name == 'None':
-        amp_name = None
+    elif len(sys.argv) == 2:
+        amp_name, amp_serial = sys.argv[1], None
+    else:
+        amp_name, amp_serial = sys.argv[1:3]
     logger.info('Connecting to a server %s (Serial %s).' % (amp_name, amp_serial))
 
     app = QApplication(sys.argv)
-    ex = Scope(amp_name, amp_serial)
+    Scope(amp_name, amp_serial)
     sys.exit(app.exec_())
 
 if __name__ == '__main__':

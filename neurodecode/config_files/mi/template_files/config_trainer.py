@@ -1,7 +1,7 @@
 #-------------------------------------------
 # Data 
 #-------------------------------------------
-DATA_PATH = ''
+DATA_PATH = r'/MY_PATH/fif'
 
 EPOCH = [0.5, 3.5]
 
@@ -41,24 +41,24 @@ EXPORT_GOOD_FEATURES = True
 FEAT_TOPN = 100
 
 #-------------------------------------------
-# Feature types
+# Classifier type (scitkit-learn style params)
 #-------------------------------------------
-
-CLASSIFIER =    {'selected': 'RF', \
-                'GB': dict(trees=1000, learning_rate=0.01, depth=3, seed=666), \
-                'RF': dict(trees=1000, depth=5, seed=666), \
-                'rLDA': dict(r_coeff=0.3), \
-                'LDA': dict()}
-
+CLASSIFIER = {'selected': 'RF', \
+    'GB': dict(n_estimators=1000, learning_rate=0.01, max_depth=3, seed=666), \
+    'RF': dict(n_estimators=1000, max_depth=5, seed=666), \
+    'rLDA': dict(r_coeff=0.3), \
+    'LDA': dict()
+}
 EXPORT_CLS = True
 
 #-------------------------------------------
 # Cross-Validation & testing
 #-------------------------------------------
 CV_PERFORM =   {'selected':'StratifiedShuffleSplit', \
-                'False':None, \
-                'StratifiedShuffleSplit': dict(test_ratio=0.2, folds=8, seed=0, export_result=True), \
-                'LeaveOneOut': dict(export_result=False)}
+    'False':None, \
+    'StratifiedShuffleSplit': dict(test_ratio=0.2, folds=8, seed=0, export_result=True), \
+    'LeaveOneOut': dict(export_result=False)
+}
 
 #-------------------------------------------
 # Parallel processing

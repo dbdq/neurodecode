@@ -12,6 +12,7 @@ Kyuhwa Lee, 2015
 
 """
 
+import os
 import sys
 import time
 import pylsl
@@ -138,15 +139,15 @@ def main():
     Invoked from console
     """
     if len(sys.argv) < 3:
-        print('Usage: {fif_file} {chunk_size} [server_name=StreamPlayer]')
+        print('Usage: %s fif_file chunk_size [server_name=StreamPlayer]' % os.path.basename(__file__))
         return
+
+    fif_file = sys.argv[1]
+    chunk_size = int(sys.argv[2])
+    if len(sys.argv) > 3:
+        server_name = sys.argv[3]
     else:
-        fif_file = sys.argv[1]
-        chunk_size = int(sys.argv[2])
-        if len(sys.argv) >= 4:
-            server_name = sys.argv[3]
-        else:
-            server_name = 'StreamPlayer'
+        server_name = 'StreamPlayer'
     stream_player(server_name, fif_file, chunk_size)
 
 def sample_code():

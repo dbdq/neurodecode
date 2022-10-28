@@ -414,10 +414,10 @@ def compute_features(cfg):
     - wlen: window length in seconds
     - w_frames: window length in frames
     - psde: MNE PSD estimator object
-    - picks: channels used for feature computation
+    - ch_names: selected channel names
+    - picks: original channel indices of the input fif
     - sfreq: input sampling frequency
     - sfreq_features: feature sampling frequency
-    - ch_names: channel names
     - times: feature timestamp (leading edge of a window)
     '''
     # Preprocessing, epoching and PSD computation
@@ -448,19 +448,24 @@ def compute_features(cfg):
 
     # Pick channels
     if cfg.PICKED_CHANNELS is None:
-        chlist = [int(x) for x in pick_types(raw.info, stim=False, eeg=True)]
+        picks = [int(x) for x in pick_types(raw.info, stim=False, eeg=True)]
+        chlist = [raw.ch_names[x] for x in picks]
     else:
         chlist = cfg.PICKED_CHANNELS
-    picks = []
-    for c in chlist:
-        if type(c) == int:
-            picks.append(c)
-        elif type(c) == str:
-            picks.append(raw.ch_names.index(c))
-        else:
-            logger.error('PICKED_CHANNELS has a value of unknown type %s.\nPICKED_CHANNELS=%s' % (type(c), cfg.PICKED_CHANNELS))
-            raise RuntimeError
+        picks = []
+        for c in chlist:
+            if type(c) == int:
+                picks.append(c)
+            elif type(c) == str:
+                picks.append(raw.ch_names.index(c))
+            else:
+                logger.error('PICKED_CHANNELS has a value of unknown type %s.\nPICKED_CHANNELS=%s' % (type(c), cfg.PICKED_CHANNELS))
+                raise RuntimeError
+
     if cfg.EXCLUDED_CHANNELS is not None:
+        if len(set(cfg.EXCLUDED_CHANNELS) & set(cfg.PICKED_CHANNELS)) > 0:
+            logger.error('in config, EXCLUDED_CHANNELS and PICKED_CHANNELS must not contain the same channel')
+            raise ValueError
         for c in cfg.EXCLUDED_CHANNELS:
             if type(c) == str:
                 if c not in raw.ch_names:
@@ -544,4 +549,5 @@ def compute_features(cfg):
     featdata['sfreq_features'] = raw.info['sfreq'] / cfg.FEATURES['PSD']['wstep']
     featdata['wlen'] = cfg.FEATURES['PSD']['wlen']
     featdata['ch_names'] = [raw.ch_names[i] for i in picks]
+    featdata['ch_names_raw'] = raw.ch_names
     return featdata

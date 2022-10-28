@@ -1,5 +1,6 @@
 from __future__ import print_function, division
 
+import os
 import sys
 from neurodecode import logger
 
@@ -61,11 +62,11 @@ def main():
     Invoked from console
     """
     if len(sys.argv) < 3:
-        event_dir = input('Events file directory? ')
-        offset = float(input('Offset in seconds? '))
-    else:
-        event_dir = sys.argv[1]
-        offset = sys.argv[2]
+        print('Usage: %s events_dir offset_seconds' % os.path.basename(__file__))
+        return
+
+    event_dir = sys.argv[1]
+    offset = sys.argv[2]
     add_lsl_events(event_dir, offset=offset, recursive=False)
 
 def sample_code():

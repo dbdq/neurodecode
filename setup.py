@@ -60,6 +60,6 @@ setup(
         'nd_tfr_export=neurodecode.analysis.tfr_export:main',
         'nd_tfr_export_each_file=neurodecode.analysis.tfr_export_each_file:main',
         'nd_trainer=neurodecode.decoder.trainer:main',
-        'nd_feature_importance_topo=neurodecode.analysis.feature_importances_topo:main'
+        'nd_decoder=neurodecode.decoder.decoder:main'
     ]}
 )

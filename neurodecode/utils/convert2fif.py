@@ -532,13 +532,14 @@ def main():
     Invoked from the console
     """
     if len(sys.argv) == 1:
-        input_dir = [input('Input directory? ')]
+        print('Usage: %s data_dir [channel_file]' % os.path.basename(__file__))
+        return
+
+    input_dir = sys.argv[1]
+    if len(sys.argv) > 2:
+        channel_file = sys.argv[2]
     else:
-        input_dir = sys.argv[1]
-        if len(sys.argv) >= 3:
-            channel_file = sys.argv[2]
-        else:
-            channel_file = None
+        channel_file = None
 
     count = 0
     for f in qc.get_file_list(input_dir, fullpath=True, recursive=True):

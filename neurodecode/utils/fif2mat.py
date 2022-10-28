@@ -47,10 +47,11 @@ def main():
     """
     Invoked from console
     """
-    if len(sys.argv) < 3:
-        fif_dir = input('fif directory? ')
-    else:
-        fif_dir = sys.argv[1]
+    if len(sys.argv) == 1:
+        print('Usage: %s fif_dir' % os.path.basename(__file__))
+        return
+
+    fif_dir = sys.argv[1]
     fif2mat(fif_dir)
 
 if __name__ == '__main__':

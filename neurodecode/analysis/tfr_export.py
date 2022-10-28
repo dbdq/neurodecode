@@ -297,10 +297,11 @@ def main():
     """
     Invoked from console
     """
-    if len(sys.argv) < 2:
-        cfg_module = input('Config module name? ')
-    else:
-        cfg_module = sys.argv[1]
+    if len(sys.argv) == 1:
+        print('Usage: %s config_module' % os.path.basename(__file__))
+        return
+
+    cfg_module = sys.argv[1]
     batch_run(cfg_module)
 
 if __name__ == '__main__':

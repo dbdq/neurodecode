@@ -47,7 +47,6 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from neurodecode.decoder.rlda import rLDA
 from neurodecode import logger
 from neurodecode.triggers.trigger_def import trigger_def
-from neurodecode.gui.streams import redirect_stdout_to_queue
 
 # supported classifiers: add this part as you add more classifiers
 CLASSIFIERS = {'RF':RandomForestClassifier, 'GB':GradientBoostingClassifier, 'XGB':XGBClassifier,
@@ -440,7 +439,7 @@ def fit_predict_thres(cls, X_train, Y_train, X_test, Y_test, cnum, label_list, i
     if ignore_thres is None or ignore_thres == 0:
         Y_pred = cls.predict(X_test)
         score = skmetrics.accuracy_score(Y_test, Y_pred)
-        cm = skmetrics.confusion_matrix(Y_test, Y_pred, label_list)
+        cm = skmetrics.confusion_matrix(Y_test, Y_pred, labels=label_list)
         f1 = skmetrics.f1_score(Y_test, Y_pred, average='macro')
     else:
         if decision_thres is not None:
@@ -456,7 +455,7 @@ def fit_predict_thres(cls, X_train, Y_train, X_test, Y_test, cnum, label_list, i
         Y_pred_underthres_count = np.array([np.count_nonzero(Y_pred_underthres == c) for c in label_list])
         Y_test_overthres = Y_test[Y_index_overthres]
         score = skmetrics.accuracy_score(Y_test_overthres, Y_pred_overthres)
-        cm = skmetrics.confusion_matrix(Y_test_overthres, Y_pred_overthres, label_list)
+        cm = skmetrics.confusion_matrix(Y_test_overthres, Y_pred_overthres, labels=label_list)
         cm = np.concatenate((cm, Y_pred_underthres_count[:, np.newaxis]), axis=1)
         f1 = skmetrics.f1_score(Y_test_overthres, Y_pred_overthres, average='macro')
 
@@ -521,7 +520,8 @@ def cross_validate(cfg, featdata, cv_file=None):
     txt += 'Spatial filter: %s (channels: %s)\n' % (cfg.SP_FILTER, cfg.SP_CHANNELS)
     txt += 'Spectral filter: %s\n' % cfg.TP_FILTER[cfg.TP_FILTER['selected']]
     txt += 'Notch filter: %s\n' % cfg.NOTCH_FILTER[cfg.NOTCH_FILTER['selected']]
-    txt += 'Channels: ' + ','.join([str(featdata['ch_names'][p]) for p in featdata['picks']]) + '\n'
+    #txt += 'Channels: ' + ','.join([str(featdata['ch_names'][p]) for p in featdata['picks']]) + '\n'
+    txt += 'Channels: %s\n' % featdata['ch_names']
     txt += 'PSD range: %.1f - %.1f Hz\n' % (cfg.FEATURES['PSD']['fmin'], cfg.FEATURES['PSD']['fmax'])
     txt += 'Window step: %.2f msec\n' % (1000.0 * cfg.FEATURES['PSD']['wstep'] / featdata['sfreq'])
     if type(wlen) is list:
@@ -579,6 +579,7 @@ def train_decoder(cfg, featdata, feat_file=None):
         cfg.FEATURES['PSD']['wlen'] = wlen
     w_frames = featdata['w_frames']
     ch_names = featdata['ch_names']
+    ch_names_raw = featdata['ch_names_raw']
     X_data_merged = np.concatenate(X_data)
     Y_data_merged = np.concatenate(Y_data)
     if cfg.CV['BALANCE_SAMPLES']:
@@ -596,12 +597,12 @@ def train_decoder(cfg, featdata, feat_file=None):
     # Export the decoder
     classes = {c:cfg.tdef.by_value[c] for c in np.unique(Y_data)}
     if cfg.FEATURES['selected'] == 'PSD':
-        data = dict(cls=cls, ch_names=ch_names, psde=featdata['psde'], sfreq=featdata['sfreq'],
-                    picks=featdata['picks'], classes=classes, epochs=cfg.EPOCH, w_frames=w_frames,
-                    w_seconds=cfg.FEATURES['PSD']['wlen'], wstep=cfg.FEATURES['PSD']['wstep'], spatial=cfg.SP_FILTER,
-                    spatial_ch=featdata['picks'], spectral=cfg.TP_FILTER[cfg.TP_FILTER['selected']], spectral_ch=featdata['picks'],
-                    notch=cfg.NOTCH_FILTER[cfg.NOTCH_FILTER['selected']], notch_ch=featdata['picks'], multiplier=cfg.MULTIPLIER,
-                    ref_ch=cfg.REREFERENCE[cfg.REREFERENCE['selected']], decim=cfg.FEATURES['PSD']['decim'])
+        data = dict(cls=cls, ch_names=ch_names, ch_names_raw=ch_names_raw, psde=featdata['psde'], sfreq=featdata['sfreq'],
+            picks=featdata['picks'], classes=classes, epochs=cfg.EPOCH, w_frames=w_frames,
+            w_seconds=cfg.FEATURES['PSD']['wlen'], wstep=cfg.FEATURES['PSD']['wstep'], spatial=cfg.SP_FILTER,
+            spatial_ch=featdata['picks'], spectral=cfg.TP_FILTER[cfg.TP_FILTER['selected']], spectral_ch=featdata['picks'],
+            notch=cfg.NOTCH_FILTER[cfg.NOTCH_FILTER['selected']], notch_ch=featdata['picks'], multiplier=cfg.MULTIPLIER,
+            ref_ch=cfg.REREFERENCE[cfg.REREFERENCE['selected']], decim=cfg.FEATURES['PSD']['decim'])
     clsfile = '%s/classifier/classifier-%s.pkl' % (cfg.DATA_PATH, platform.architecture()[0])
     qc.make_dirs('%s/classifier' % cfg.DATA_PATH)
     qc.save_obj(clsfile, data)
@@ -635,13 +636,11 @@ def train_decoder(cfg, featdata, feat_file=None):
             else:
                 gfout = open(feat_file, 'w')
 
-        if type(wlen) is not list:
-            ch_names = [ch_names[c] for c in featdata['picks']]
-        else:
+        if type(wlen) is list:
             ch_names = []
             for w in range(len(wlen)):
                 for c in featdata['picks']:
-                    ch_names.append('w%d-%s' % (w, ch_names[c]))
+                    ch_names.append('w%d-%s' % (w, ch_names_raw[c]))
 
         chlist, hzlist = features.feature2chz(keys, fqlist, ch_names=ch_names)
         valnorm = values.copy()
@@ -671,11 +670,6 @@ def batch_run(cfg_module):
     run(cfg, interactive=True)
 
 def run(cfg, interactive=False, cv_file=None, feat_file=None, logger=logger):
-
-    redirect_stdout_to_queue(logger, queue, 'INFO')
-    if state is None:
-        state = mp.Value('i', 1)
-
     # add tdef object
     cfg.tdef = trigger_def(cfg.TRIGGER_FILE)
 
@@ -698,10 +692,11 @@ def main():
     Invoked from console
     """
     # Load parameters
-    if len(sys.argv) < 2:
-        cfg_module = input('Config module name? ')
-    else:
-        cfg_module = sys.argv[1]
+    if len(sys.argv) == 1:
+        print('Usage: %s config_module' % os.path.basename(__file__))
+        return
+
+    cfg_module = sys.argv[1]
     batch_run(cfg_module)
     logger.info('Finished.')
 

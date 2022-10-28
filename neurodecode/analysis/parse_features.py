@@ -182,10 +182,11 @@ def main():
     """
     Invoked from console
     """
-    if len(sys.argv) >= 2:
-        featfile = sys.argv[1]
-    else:
-        featfile = None
+    if len(sys.argv) < 2:
+        print('Usage: %s feature_file' % os.path.basename(__file__))
+        return
+
+    featfile = sys.argv[1]
     config_run(featfile)
 
 if __name__ == '__main__':

@@ -107,11 +107,31 @@ because the default gUSBamp LSL server do not stream event channel as part of th
 Use the OpenVibe acquisition server and make sure to check "LSL output" in preference.  If you don't see "eego" from the device selection, it's probably because you didn't install the additional drivers when you installed OpenVibe.
 
 
-# To do
-  - GUI (in progress)
-  - Tutorial 
-  - More cpu-efficient decoder class
-  - Numba optimization
+
+# Running examples
+
+To run this example, copy the sample data and codes to a new folder and cd into this folder.
+
+1. Replay data in real-time as if acquiring signals from brain with a chunk size of 8  
+```nd_stream_player mi_left_right.fif 8```
+
+2. Record streaming data  
+```
+nd_stream_recorder $PWD/records # for Linux
+nd_stream_recorder %CD%\records # for Windows
+```
+
+3. Visualise the signals (choose StreamPlayer from the list)  
+```nd_stream_viewer```
+
+4. Run an offline protocol for training (can be skipped for this exercise)  
+```nd_train_mi config_offline.py```
+
+5. Train a decoder  
+```nd_trainer config_trainer.py```
+
+6. Run an online protocol and test a decoder  
+```nd_test_mi config_online.py```
 
 There are still plenty of possibilities to optimize the speed in many parts of the code. Any contribution is welcome. Please contact lee.kyuh@gmail.com for any comment / feedback.
 

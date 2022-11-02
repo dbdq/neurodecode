@@ -115,23 +115,46 @@ To run this example, copy the sample data and codes to a new folder and cd into 
 1. Replay data in real-time as if acquiring signals from brain with a chunk size of 8  
 ```nd_stream_player mi_left_right.fif 8```
 
+![image](https://user-images.githubusercontent.com/6797783/199510832-c10b7df9-193b-4396-a671-15f6f8df0226.png)
+
 2. Record streaming data  
+Simulate real-time decoding from the brain. We are streaming the data using nd_stream_player script above but the receiver
+is source-agnostic which allows the full simulation of replaying and processing the data.
 ```
 nd_stream_recorder $PWD/records # for Linux
 nd_stream_recorder %CD%\records # for Windows
 ```
+This step can be skipped if you create a folder ./fif/ and copy the sample fif file into ./fif/.
+ 
+![image](https://user-images.githubusercontent.com/6797783/199511174-abb1ac03-eadc-488d-833a-6e303a93e331.png)
 
-3. Visualise the signals (choose StreamPlayer from the list)  
+3. Visualise signals (choose StreamPlayer from the list)  
 ```nd_stream_viewer```
 
-4. Run an offline protocol for training (can be skipped for this exercise)  
-```nd_train_mi config_offline.py```
+![image](https://user-images.githubusercontent.com/6797783/199509891-a0f30cfd-c589-4004-89f0-c71ff08b4071.png)
+
+4. Run an offline protocol for training
+Runs an offline training protocol. This step is just for explanation purpose and can be skipped.
+```nd_train_mi ./config_offline.py```
+
+![image](https://user-images.githubusercontent.com/6797783/199511602-6bec54d0-50dd-485c-8d3e-6fa7621cc773.png)
 
 5. Train a decoder  
-```nd_trainer config_trainer.py```
+Train a decoder using the fif file with defined events. In this example, it is left (event 11) vs right (event 9) hand motor imagery.
+```nd_trainer ./config_trainer.py```
+Events are defined in mi_left_right_events.ini file.
 
 6. Run an online protocol and test a decoder  
 ```nd_test_mi config_online.py```
+The provided sample is set to 60 seconds time-out without early termination so you can see
+the decoder output changes to left or right when the left (event 11) or right(event 9) is emitted 
+from the stream player terminal. Other events such as rest is undefined and will behave in random direction.
+
+![image](https://user-images.githubusercontent.com/6797783/199511564-c4f2c6ed-8372-4cb3-86d2-a7306caf2f80.png)  
+Example decoder output.
+
+![image](https://user-images.githubusercontent.com/6797783/199514155-a94bbb71-c2dc-43d5-81e8-2bd4916a05e4.png)  
+Events emitted from the stream player.
 
 There are still plenty of possibilities to optimize the speed in many parts of the code. Any contribution is welcome. Please contact lee.kyuh@gmail.com for any comment / feedback.
 

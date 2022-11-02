@@ -151,7 +151,7 @@ the decoder output changes to left or right when the left (event 11) or right(ev
 from the stream player terminal. Other events such as rest is undefined and will behave in random direction.
 
 ![image](https://user-images.githubusercontent.com/6797783/199517521-de33e4f2-92bf-421f-8afc-9eee5c899a04.png)  
-![image](https://user-images.githubusercontent.com/6797783/199518166-67f8a4ea-dde9-4544-b95d-80ed5f0526aa.png)
+![image](https://user-images.githubusercontent.com/6797783/199518166-67f8a4ea-dde9-4544-b95d-80ed5f0526aa.png)  
 Sample decoder output with probabilities and the corresponding bar position, which represents the accumulated probabilities.
 
 ![image](https://user-images.githubusercontent.com/6797783/199514155-a94bbb71-c2dc-43d5-81e8-2bd4916a05e4.png)  

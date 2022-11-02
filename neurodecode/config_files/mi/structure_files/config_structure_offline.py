@@ -15,7 +15,7 @@ class Basic:
     # feedback type
     #-------------------------------------------
     params2 = dict()
-    params2.update({'FEEDBACK_TYPE': ('BAR', 'BODY')})
+    params2.update({'FEEDBACK_TYPE': ('BAR', 'IMAGE')})
     params2.update({'FEEDBACK_IMAGE_PATH': str})
     params2.update({'REFRESH_RATE': int})              # Maximum refresh rate in Hz
 

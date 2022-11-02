@@ -149,7 +149,7 @@ class Feedback:
                 if self.cfg.SHOW_CUE is True:
                     if self.cfg.FEEDBACK_TYPE == 'BAR':
                         self.viz.move(true_label, 100, overlay=False, barcolor='G')
-                    elif self.cfg.FEEDBACK_TYPE == 'BODY':
+                    elif self.cfg.FEEDBACK_TYPE == 'IMAGE':
                         self.viz.put_text(DIRS[true_label], 'R')
                     if true_label == 'L':  # left
                         self.trigger.signal(self.tdef.LEFT_READY)
@@ -165,11 +165,11 @@ class Feedback:
                         raise RuntimeError('Unknown direction %s' % true_label)
                 self.tm_trigger.reset()
                 '''
-                if self.cfg.FEEDBACK_TYPE == 'BODY':
+                if self.cfg.FEEDBACK_TYPE == 'IMAGE':
                     self.viz.set_pc_feedback(False)
                 self.viz.move(true_label, 100, overlay=False, barcolor='G')
 
-                if self.cfg.FEEDBACK_TYPE == 'BODY':
+                if self.cfg.FEEDBACK_TYPE == 'IMAGE':
                     self.viz.set_pc_feedback(True)
                     if self.cfg.SHOW_CUE is True:
                         self.viz.put_text(dirs[true_label], 'R')
@@ -230,13 +230,13 @@ class Feedback:
                                 res_color = 'Y'
                         else:
                             res_color = 'Y'
-                        if self.cfg.FEEDBACK_TYPE == 'BODY':
+                        if self.cfg.FEEDBACK_TYPE == 'IMAGE':
                             self.viz.move(bar_label, bar_score, overlay=False, barcolor=res_color, caption=DIRS[bar_label], caption_color=res_color)
                         else:
                             self.viz.move(bar_label, 100, overlay=False, barcolor=res_color)
                     else:
                         res_color = 'Y'
-                        if self.cfg.FEEDBACK_TYPE == 'BODY':
+                        if self.cfg.FEEDBACK_TYPE == 'IMAGE':
                             self.viz.move(bar_label, bar_score, overlay=False, barcolor=res_color, caption='TRIAL END', caption_color=res_color)
                         else:
                             self.viz.move(bar_label, 0, overlay=False, barcolor=res_color)
@@ -358,7 +358,7 @@ class Feedback:
                             bar_score = int(bar_score)
                             if bar_score > 100:
                                 bar_score = 100
-                            if self.cfg.FEEDBACK_TYPE == 'BODY':
+                            if self.cfg.FEEDBACK_TYPE == 'IMAGE':
                                 if self.cfg.SHOW_CUE:
                                     self.viz.move(bar_label, bar_score, overlay=False, caption=DIRS[true_label], caption_color='G')
                                 else:
@@ -391,7 +391,7 @@ class Feedback:
 
             elif state == 'feedback' and self.tm_trigger.sec() > self.cfg.TIMINGS['FEEDBACK']:
                 self.trigger.signal(self.tdef.BLANK)
-                if self.cfg.FEEDBACK_TYPE == 'BODY':
+                if self.cfg.FEEDBACK_TYPE == 'IMAGE':
                     state = 'return'
                     self.tm_trigger.reset()
                 else:

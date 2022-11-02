@@ -1,6 +1,5 @@
 TRIGGER_DEVICE = 'SOFTWARE'
-#DATA_PATH = r'/MY_PATH'
-TRIGGER_FILE = ''
+TRIGGER_FILE = r'/MY_TRIGGER_PATH/TRIGGER_FILE.ini'
 
 FEEDBACK_TYPE = 'BAR'
 FEEDBACK_IMAGE_PATH = ''
@@ -21,6 +20,6 @@ TIMINGS = { 'INIT':2,           \
             'READY': 1,         \
             'READY_RANDOMIZE':0,    \
             'DIR': 5,           \
-            'DIR_RANDOMIZE': 0}   
+            'DIR_RANDOMIZE': 0}
 
 GLASS_USE = False

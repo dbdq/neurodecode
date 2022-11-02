@@ -37,7 +37,7 @@ def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_sta
                      but uses much more cpu due to polling.
     trigger_file: used to convert event numbers into event strings for readability.
 
-    Note: Run pycnbi.set_log_level('DEBUG') to print out the relative time stamps since started.
+    Note: Run neurodecode.set_log_level('DEBUG') to print out the relative time stamps since started.
 
     """
     raw, events = pu.load_raw(fif_file)
@@ -62,8 +62,7 @@ def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_sta
         raise RuntimeError('Error while loading %s' % fif_file)
 
     # set server information
-    sinfo = pylsl.StreamInfo(server_name, channel_count=n_channels, channel_format='float32',\
-        nominal_srate=sfreq, type='EEG', source_id=server_name)
+    sinfo = pylsl.StreamInfo(server_name, channel_count=n_channels, channel_format='float32', nominal_srate=sfreq, type='EEG', source_id=server_name)
     desc = sinfo.desc()
     channel_desc = desc.append_child("channels")
     for ch in raw.ch_names:

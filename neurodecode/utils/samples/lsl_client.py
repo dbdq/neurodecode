@@ -1,12 +1,12 @@
 from __future__ import print_function, division
 
 import neurodecode
-import neurodecode.utils.cnbi_lsl as cnbi_lsl
+import neurodecode.utils.nd_lsl as nd_lsl
 import time
 
 LSL_SERVER = 'RexController'
 print('Connecting to %s server' % LSL_SERVER)
-inlet = cnbi_lsl.start_client(LSL_SERVER)
+inlet = nd_lsl.start_client(LSL_SERVER)
 
 while True:
     # pull_chunk

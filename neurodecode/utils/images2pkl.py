@@ -7,7 +7,7 @@ Compress feedback images into a single pickle object.
 
 import gzip
 import neurodecode.utils.q_common as qc
-from neurodecode.protocols.viz_human import read_images
+from neurodecode.protocols.viz_images import read_images
 from neurodecode import logger
 try:
     import cPickle as pickle  # Python 2 (cPickle = C version of pickle)
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     EXPORT_IMAGE_DIR = r'D:\work\pycnbi_protocols\BodyFeedback'
 
     if pickle.HIGHEST_PROTOCOL >= 4:
-        outfile = '%s/BodyVisuals.pkl' % EXPORT_IMAGE_DIR
+        outfile = '%s/ImageVisuals.pkl' % EXPORT_IMAGE_DIR
         tm = qc.Timer()
         logger.info('Reading images from %s' % LEFT_IMAGE_DIR )
         left_images = read_images(LEFT_IMAGE_DIR)

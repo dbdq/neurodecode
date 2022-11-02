@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 try:
     from neurodecode import logger
 except ImportError:
-    logging.basicConfig(format='%(msg)s', level='DEBUG')
+    logging.basicConfig(format='%(msg)s', level='INFO')
     logger = logging.getLogger(__name__)
     logger.propagate = False
 
@@ -599,7 +599,7 @@ def confusion_matrix(Y_true, Y_pred, label_len=6):
     elif len(Y_pred) < len(Y_true):
         Y_true = Y_true[:len(Y_pred)]
 
-    cm = sklearn.metrics.confusion_matrix(Y_true, Y_pred, Y_labels)
+    cm = sklearn.metrics.confusion_matrix(Y_true, Y_pred, labels=Y_labels)
 
     # compute confusion matrix
     cm_rate = cm.copy().astype('float')

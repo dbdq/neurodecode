@@ -2,12 +2,12 @@ from __future__ import print_function, division
 
 import neurodecode
 import random
-import neurodecode.utils.cnbi_lsl as cnbi_lsl
+import neurodecode.utils.nd_lsl as nd_lsl
 
 LSL_SERVER = 'RexController'
 vals = [3, 5, 6, 7]
 
-outlet = cnbi_lsl.start_server('RexController', channel_format='double64')
+outlet = nd_lsl.start_server('RexController', channel_format='double64')
 print(LSL_SERVER, 'server start.')
 
 while True:

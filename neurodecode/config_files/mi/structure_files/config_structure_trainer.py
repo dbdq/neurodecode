@@ -5,17 +5,17 @@ class Basic:
     """
 
     #-------------------------------------------
-    # Data 
+    # Data
     #-------------------------------------------
     params1 = dict()
     params1.update({'DATA_PATH': str})                                      # read all data files from this directory to train on
-    
+
     #-------------------------------------------
     # Events
     #-------------------------------------------
     params2 = dict()
     params2.update({'EPOCH': list})
- 
+
     #-------------------------------------------
     # Channels specification
     #-------------------------------------------
@@ -30,7 +30,6 @@ class Basic:
     #-------------------------------------------
     params5 = dict()
     params5.update({'SP_FILTER': (None, 'car', 'laplacian')})               # apply spatial filter immediately after loading data
-    params5.update({'SP_CHANNELS': list})                                   # only consider the following channels while computing
     # apply spectrial filter immediately after applying SP_FILTER
     # Can be either overlap-add FIR or forward-backward IIR via filtfilt
         # if lfreq < hfreq: bandpass
@@ -56,12 +55,12 @@ class Advanced:
     #-------------------------------------------
     # Trigger
     #-------------------------------------------
-    params1 = dict()                            
+    params1 = dict()
     params1.update({'TRIGGER_FILE': str})                            # which trigger file template
     params1.update({'TRIGGER_DEF': str})                             # which trigger set?
     params1.update({'LOAD_EVENTS': {'False':None, 'True':str}})
-    
-   
+
+
     #-------------------------------------------
     # Unit conversion
     #-------------------------------------------

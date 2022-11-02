@@ -37,7 +37,6 @@ MULTIPLIER = 10 ** 6  # (V->uV)
 """""""""""""""""""""""""""'''
 # apply spatial filter immediately after loading data
 SP_FILTER = 'car'  # None | 'laplacian' | 'car'
-SP_CHANNELS = CHANNEL_PICKS  # None | dict (for Laplacian)
 
 # apply spectrial filter immediately after applying SP_FILTER
 # Can be either overlap-add FIR or forward-backward IIR via filtfilt

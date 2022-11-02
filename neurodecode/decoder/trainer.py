@@ -70,7 +70,6 @@ def check_config(cfg):
                     'DATA_PATH',
                     'PICKED_CHANNELS',
                     'SP_FILTER',
-                    'SP_CHANNELS',
                     'TP_FILTER',
                     'NOTCH_FILTER',
                     'FEATURES',
@@ -517,7 +516,7 @@ def cross_validate(cfg, featdata, cv_file=None):
         txt += 'The number of samples was balanced using %ssampling.\n' % cfg.BALANCE_SAMPLES.lower()
     txt += '\n- Experiment condition\n'
     txt += 'Sampling frequency: %.3f Hz\n' % featdata['sfreq']
-    txt += 'Spatial filter: %s (channels: %s)\n' % (cfg.SP_FILTER, cfg.SP_CHANNELS)
+    txt += 'Spatial filter: %s\n' % cfg.SP_FILTER
     txt += 'Spectral filter: %s\n' % cfg.TP_FILTER[cfg.TP_FILTER['selected']]
     txt += 'Notch filter: %s\n' % cfg.NOTCH_FILTER[cfg.NOTCH_FILTER['selected']]
     #txt += 'Channels: ' + ','.join([str(featdata['ch_names'][p]) for p in featdata['picks']]) + '\n'

@@ -65,7 +65,7 @@ def check_config(cfg):
     optional_vars = {
         'AMP_NAME':None,
         'AMP_SERIAL':None,
-        'FAKE_CLS':None,
+        'MOCK_CLS':None,
         'TRIALS_RANDOMIZE':True,
         'BAR_SLOW_START':{'selected':'False', 'False':None, 'True':[1.0]},
         'PARALLEL_DECODING':{'selected':'False', 'False':None, 'True':{'period':0.06, 'num_strides':3}},
@@ -81,7 +81,6 @@ def check_config(cfg):
         'SCREEN_POS':(0, 0),
         'DEBUG_PROBS':False,
         'LOG_PROBS':False,
-        'WITH_REX': False,
         'WITH_STIMO': False,
     }
 
@@ -112,14 +111,14 @@ def check_config(cfg):
             logger.warning('Setting undefined parameter %s=%s' % (key, getattr(cfg, key)))
 
     if getattr(cfg, 'TRIGGER_DEVICE') == None:
-        logger.warning('The trigger device is set to None! No events will be saved.')
-        raise RuntimeError('The trigger device is set to None! No events will be saved.')
+        logger.error('The trigger device is set to None. Use MOCK trigger if you want to test without saving any events.')
+        raise RuntimeError('The trigger device cannot be set to None.')
 
 # for batch script
 def run(cfg):
     qc.print_c('WITH_STIMO = %s' % cfg.WITH_STIMO, 'G')
 
-    if cfg.FAKE_CLS is None:
+    if cfg.MOCK_CLS is None:
         # chooose amp
         if cfg.AMP_NAME is None and cfg.AMP_SERIAL is None:
             amp_name, amp_serial = pu.search_lsl(ignore_markers=True)
@@ -140,11 +139,11 @@ def run(cfg):
     if trigger.init(50) == False:
         logger.error('Cannot connect to USB2LPT device. Use a mock trigger instead?')
         input('Press Ctrl+C to stop or Enter to continue.')
-        trigger = pyLptControl.MockTrigger()
+        trigger = pyLptControl.Trigger('MOCK')
         trigger.init(50)
 
     # init classification
-    decoder = BCIDecoderDaemon(cfg.DECODER_FILE, buffer_size=1.0, fake=(cfg.FAKE_CLS is not None),
+    decoder = BCIDecoderDaemon(cfg.DECODER_FILE, buffer_size=1.0, fake=(cfg.MOCK_CLS is not None),
                                amp_name=amp_name, amp_serial=amp_serial, fake_dirs=fake_dirs,
                                parallel=cfg.PARALLEL_DECODING[cfg.PARALLEL_DECODING['selected']], alpha_new=cfg.PROB_ALPHA_NEW)
 
@@ -172,7 +171,7 @@ def run(cfg):
     num_trials = len(dir_seq)
 
     logger.info('Initializing decoder.')
-    while decoder.is_running() is 0:
+    while decoder.is_running() == 0:
         time.sleep(0.01)
 
     # bar visual object
@@ -180,10 +179,10 @@ def run(cfg):
         from neurodecode.protocols.viz_bars import BarVisual
         visual = BarVisual(cfg.GLASS_USE, screen_pos=cfg.SCREEN_POS,
             screen_size=cfg.SCREEN_SIZE)
-    elif cfg.FEEDBACK_TYPE == 'BODY':
+    elif cfg.FEEDBACK_TYPE == 'IMAGE':
         assert hasattr(cfg, 'FEEDBACK_IMAGE_PATH'), 'FEEDBACK_IMAGE_PATH is undefined in your config.'
-        from neurodecode.protocols.viz_human import BodyVisual
-        visual = BodyVisual(cfg.FEEDBACK_IMAGE_PATH, use_glass=cfg.GLASS_USE,
+        from neurodecode.protocols.viz_images import ImageVisual
+        visual = ImageVisual(cfg.FEEDBACK_IMAGE_PATH, use_glass=cfg.GLASS_USE,
             screen_pos=cfg.SCREEN_POS, screen_size=cfg.SCREEN_SIZE)
     visual.put_text('Waiting to start')
     if cfg.LOG_PROBS:
@@ -217,26 +216,6 @@ def run(cfg):
         else:
             pred_label = result
         dir_detected.append(pred_label)
-
-        if cfg.WITH_REX is True and pred_label == true_label:
-            # if cfg.WITH_REX is True:
-            if pred_label == 'U':
-                rex_dir = 'N'
-            elif pred_label == 'L':
-                rex_dir = 'W'
-            elif pred_label == 'R':
-                rex_dir = 'E'
-            elif pred_label == 'D':
-                rex_dir = 'S'
-            else:
-                logger.warning('Rex cannot execute undefined action %s' % pred_label)
-                rex_dir = None
-            if rex_dir is not None:
-                visual.move(pred_label, 100, overlay=False, barcolor='B')
-                visual.update()
-                logger.info('Executing Rex action %s' % rex_dir)
-                os.system('%s/Rex/RexControlSimple.exe %s %s' % (neurodecode.ROOT, cfg.REX_COMPORT, rex_dir))
-                time.sleep(8)
 
         if true_label == pred_label:
             msg = 'Correct'

@@ -78,7 +78,7 @@ def read_images(img_path, screen_size=None):
     return pnglist
 
 
-class BodyVisual(object):
+class ImageVisual(object):
     # Default setting
     color = dict(G=(20, 140, 0), B=(255, 90, 0), R=(0, 50, 200), Y=(0, 215, 235), K=(0, 0, 0),\
                  W=(255, 255, 255), w=(200, 200, 200))

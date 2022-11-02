@@ -109,7 +109,7 @@ def run(cfg):
     if trigger.init(50) == False:
         logger.error('\n** Error connecting to USB2LPT device. Use a mock trigger instead?')
         input('Press Ctrl+C to stop or Enter to continue.')
-        trigger = pyLptControl.MockTrigger()
+        trigger = pyLptControl.Trigger('MOCK')
         trigger.init(50)
 
     # timers

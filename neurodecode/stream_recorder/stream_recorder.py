@@ -38,7 +38,7 @@ import neurodecode.utils.add_lsl_events
 import neurodecode.utils.q_common as qc
 import neurodecode.utils.pycnbi_utils as pu
 from neurodecode.utils.convert2fif import pcl2fif
-from neurodecode.utils.cnbi_lsl import start_server
+from neurodecode.utils.nd_lsl import start_server
 from neurodecode.stream_receiver.stream_receiver import StreamReceiver
 from neurodecode import logger
 from builtins import input

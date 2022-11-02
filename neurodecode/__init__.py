@@ -95,7 +95,6 @@ def add_logger_handler(logger, stream, verbosity='INFO'):
     logger.addHandler(c_handler)
 
     # minimum possible level of all handlers
-    #logger.setLevel(logging.DEBUG)
     set_log_level(logger, verbosity, -1)
     return logger
 
@@ -114,6 +113,10 @@ for d in qc.get_dir_list(ROOT):
 
 # set loggers
 logging.getLogger('matplotlib').setLevel(logging.ERROR)
+logging.getLogger('sklearn').setLevel(logging.WARNING)
+logging.getLogger('PIL').setLevel(logging.WARNING)
+logging.getLogger('asyncio').setLevel(logging.WARNING)
+
 logger = logging.getLogger('neurodecode')
 logger.propagate = False
-init_logger(logger)
+init_logger(logger, 'INFO')

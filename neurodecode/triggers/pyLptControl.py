@@ -18,7 +18,7 @@ import ctypes
 import threading
 import multiprocessing as mp
 import neurodecode.utils.q_common as qc
-import neurodecode.utils.cnbi_lsl as cnbi_lsl
+import neurodecode.utils.nd_lsl as nd_lsl
 import neurodecode.utils.pycnbi_utils as pu
 from neurodecode import logger
 from builtins import input, bytes
@@ -29,15 +29,16 @@ class Trigger(object):
      'Arduino': CNBI Arduino trigger
      'USB2LPT': Commercial USB2LPT adapter
      'DESKTOP': Desktop native LPT
-     'SOFTWARE': Software trigger
-     'FAKE': Mock trigger device for testing
+     'SOFTWARE': Software trigger (StreamRecorderInfo LSL server required)
+     'MOCK': Mock trigger device for testing
 
     When using USB2LPT, the port number (e.g. 0x378) can be searched automatically.
     When using Desktop's LPT, the port number must be specified during initialization.
 
-    Software trigger writes event information into a text file with LSL timestamps, which
-    can be later added to fif. This file will be automatically saved and closed when Ctrl+C is
-    pressed or terminal window is closed (or killed for whatever reason).
+    Software trigger writes event information into a text file with LSL timestamps in the
+    same folder where StreamRecorder writes data, to be added later to the fif file.
+    This file will be automatically saved and closed when Ctrl+C is pressed or
+    terminal window is closed (or killed for whatever reason).
 
     The asynchronous function signal(x) sends 1-byte integer value x and returns immediately.
     It schedules to send the value 0 at the end of the signal length.
@@ -128,7 +129,7 @@ class Trigger(object):
 
             # get data file location
             LSL_SERVER = 'StreamRecorderInfo'
-            inlet = cnbi_lsl.start_client(LSL_SERVER, state)
+            inlet = nd_lsl.start_client(LSL_SERVER)
             evefile = inlet.info().source_id()
             eveoffset_file = evefile[:-4] + '-offset.txt'
             logger.info('Event file is: %s' % evefile)
@@ -148,9 +149,9 @@ class Trigger(object):
                     f.write('Local time: %.6f\n' % local_time)
                 logger.info('LSL timestamp offset (%.3f) saved to %s' % (lsl_time_offset, eveoffset_file))
 
-        elif self.lpttype == 'FAKE' or self.lpttype is None or self.lpttype is False:
+        elif self.lpttype == 'MOCK' or self.lpttype is None or self.lpttype is False:
             logger.warning('Using a fake trigger.')
-            self.lpttype = 'FAKE'
+            self.lpttype = 'MOCK'
             self.lpt = None
 
         else:
@@ -165,7 +166,7 @@ class Trigger(object):
         if self.lpttype == 'SOFTWARE':
             logger.info('Ignoring delay parameter for software trigger.')
             return True
-        elif self.lpttype == 'FAKE':
+        elif self.lpttype == 'MOCK':
             return True
         else:
             self.delay = duration / 1000.0
@@ -191,8 +192,8 @@ class Trigger(object):
         if self.lpttype == 'SOFTWARE':
             logger.error('set_data() not supported for software trigger.')
             return False
-        elif self.lpttype == 'FAKE':
-            logger.info('FAKE trigger value %s' % value)
+        elif self.lpttype == 'MOCK':
+            logger.info('MOCK trigger value %s' % value)
             return True
         else:
             if self.lpttype == 'USB2LPT':
@@ -210,8 +211,8 @@ class Trigger(object):
             if self.verbose is True:
                 logger.info('Sending software trigger %s' % value)
             return self.write_event(value)
-        elif self.lpttype == 'FAKE':
-            logger.info('Sending FAKE trigger signal %s' % value)
+        elif self.lpttype == 'MOCK':
+            logger.info('Sending MOCK trigger signal %s' % value)
             return True
         else:
             if self.offtimer.is_alive():
@@ -228,8 +229,8 @@ class Trigger(object):
     def signal_off(self):
         if self.lpttype == 'SOFTWARE':
             return self.write_event(0)
-        elif self.lpttype == 'FAKE':
-            logger.info('FAKE trigger off')
+        elif self.lpttype == 'MOCK':
+            logger.info('MOCK trigger off')
             return True
         else:
             self.set_data(0)
@@ -240,37 +241,11 @@ class Trigger(object):
         if self.lpttype == 'SOFTWARE':
             logger.error('set_pin() not supported for software trigger.')
             return False
-        elif self.lpttype == 'FAKE':
-            logger.info('FAKE trigger pin %s' % pin)
+        elif self.lpttype == 'MOCK':
+            logger.info('MOCK trigger pin %s' % pin)
             return True
         else:
             self.set_data(2 ** (pin - 1))
-
-
-class MockTrigger(object):
-    def __init__(self):
-        logger.warning(' WARNING: MockTrigger class is deprecated.')
-        logger.warning("          Use Trigger('FAKE') instead.")
-
-    def init(self, duration=100):
-        logger.info('Mock Trigger ready')
-        return True
-
-    def signal(self, value):
-        logger.info('FAKE trigger signal %s' % value)
-        return Trues
-
-    def signal_off(self):
-        logger.info('FAKE trigger value 0')
-        return True
-
-    def set_data(self, value):
-        logger.info('FAKE trigger value %s' % value)
-        return True
-
-    def set_pin(self, pin):
-        logger.info('FAKE trigger pin %s' % pin)
-        return True
 
 
 # set 1 to each bit and rotate from bit 0 to bit 7
@@ -283,11 +258,11 @@ def test_all_bits(trigger):
 
 # sample test code
 if __name__ == '__main__':
-    #trigger = Trigger('COM3') # Arduino trigger
-    trigger = Trigger('SOFTWARE')
+    trigger = Trigger('ARDUINO') # Arduino trigger
+    #trigger = Trigger('SOFTWARE')
     if not trigger.init(500):
-        print('LPT port cannot be opened. Using mock trigger.')
-        trigger = MockTrigger()
+        print('LPT port cannot be opened. Using a mock trigger.')
+        trigger = Trigger('MOCK')
 
     # Christmas tree mode (set 1 bit-by-bit)
     #test_all_bits(trigger)

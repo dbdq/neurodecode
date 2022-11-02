@@ -132,7 +132,6 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
 
     # set channels of interest
     picks = pu.channel_names_to_index(raw, cfg.CHANNEL_PICKS)
-    spchannels = pu.channel_names_to_index(raw, cfg.SP_CHANNELS)
 
     if max(picks) > len(raw.info['ch_names']):
         msg = 'ERROR: "picks" has a channel index %d while there are only %d channels.' %\
@@ -140,7 +139,7 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
         raise RuntimeError(msg)
 
     # Apply filters
-    raw = pu.preprocess(raw, spatial=cfg.SP_FILTER, spatial_ch=spchannels, spectral=cfg.TP_FILTER,
+    raw = pu.preprocess(raw, spatial=cfg.SP_FILTER, spatial_ch=picks, spectral=cfg.TP_FILTER,
                   spectral_ch=picks, notch=cfg.NOTCH_FILTER, notch_ch=picks,
                   multiplier=cfg.MULTIPLIER, n_jobs=n_jobs, decim=decim)
     sfreq /= decim

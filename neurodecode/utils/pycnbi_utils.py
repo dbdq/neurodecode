@@ -212,8 +212,7 @@ def preprocess(raw, sfreq=None, spatial=None, spatial_ch=None, spectral=None, sp
         'car': channel indices used for CAR filtering. If None, use all channels except
                the trigger channel (index 0).
         'laplacian': {channel:[neighbor1, neighbor2, ...], ...}
-        *** Note ***
-        Since PyCNBI puts trigger channel as index 0, data channel starts from index 1.
+        (Note) since Neurodecode puts trigger channel as index 0, data channel starts from index 1.
 
     spectral: None | [l_freq, h_freq]
         Spectral filter.
@@ -367,10 +366,10 @@ def preprocess(raw, sfreq=None, spatial=None, spatial_ch=None, spectral=None, sp
         # fir_design='firwin' is especially important for ICA analysis. See:
         # http://martinos.org/mne/dev/generated/mne.preprocessing.ICA.html?highlight=score_sources#mne.preprocessing.ICA.score_sources
         mne.filter.filter_data(data, sfreq, spectral[0], spectral[1], picks=spectral_ch_i,
-                               filter_length='auto', l_trans_bandwidth='auto',
-                               h_trans_bandwidth='auto', n_jobs=n_jobs, method='fir',
-                               iir_params=None, copy=False, phase='zero',
-                               fir_window='hamming', fir_design='firwin', verbose='ERROR')
+            filter_length='auto', l_trans_bandwidth='auto',
+            h_trans_bandwidth='auto', n_jobs=n_jobs, method='fir',
+            iir_params=None, copy=False, phase='zero',
+            fir_window='hamming', fir_design='firwin', verbose='ERROR')
 
     # Apply notch filter
     if notch is not None:

@@ -1,30 +1,29 @@
 #-------------------------------------------
-# Data 
+# Data
 #-------------------------------------------
-DATA_PATH = r'/MY_PATH/fif'
+DATA_PATH = r'/MY_FIF_PATH'
 
 EPOCH = [0.5, 3.5]
 
 #-------------------------------------------
 # Trigger
 #-------------------------------------------
-TRIGGER_FILE = ''
+TRIGGER_FILE = r'/MY_TRIGGER_PATH/TRIGGER_FILE.ini'
 TRIGGER_DEF = ['LEFT_GO', 'RIGHT_GO']
 LOAD_EVENTS = {'selected':'False', 'False':None, 'True':'C:'}
 
 #-------------------------------------------
 # Channels specification
 #-------------------------------------------
-PICKED_CHANNELS= ['Fz', 'F3', 'F4', 'F7', 'F8', 'Cz', 'C3', 'C4', 'P3', 'Pz', 'P4' ] 
-EXCLUDED_CHANNELS = ['Fz']
-
+PICKED_CHANNELS= ['Fz', 'F3', 'F4', 'F7', 'F8', 'Cz', 'C3', 'C4', 'P3', 'Pz', 'P4' ]
+EXCLUDED_CHANNELS = []
+# REREFERENCE still under development -- values will be ignored
 REREFERENCE = {'selected':'False', 'False':None, 'True':dict(New=['Cz'], Old=['M1/2', 'M2/2'])}
 
 #-------------------------------------------
-# Filters
+# Filters to be applied on picked channels
 #-------------------------------------------
 SP_FILTER = 'car'
-SP_CHANNELS = PICKED_CHANNELS
 TP_FILTER = {'selected':'False', 'False':None, 'True':[1, 40]}
 NOTCH_FILTER = {'selected':'False', 'False':None, 'True':[50]}
 
@@ -34,7 +33,7 @@ NOTCH_FILTER = {'selected':'False', 'False':None, 'True':[50]}
 MULTIPLIER = 1
 
 #-------------------------------------------
-# PSD 
+# PSD
 #-------------------------------------------
 FEATURES = {'selected':'PSD','PSD':dict(fmin=1, fmax=40, wlen=0.5, wstep=10, decim=1)}
 EXPORT_GOOD_FEATURES = True

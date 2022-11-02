@@ -15,13 +15,13 @@ class Basic:
     params1 = dict()
     params1.update({'DECODER_FILE': str})
     params1.update({'DIRECTIONS': ('L', 'R', 'U', 'D', 'B')})
-    params1.update({'FAKE_CLS': (None, True)})
+    params1.update({'MOCK_CLS': (None, True)})
 
     #-------------------------------------------
     # feedback type
     #-------------------------------------------
     params2 = dict()
-    params2.update({'FEEDBACK_TYPE': ('BAR', 'BODY')})
+    params2.update({'FEEDBACK_TYPE': ('BAR', 'IMAGE')})
     params2.update({'FEEDBACK_IMAGE_PATH': str})
     params2.update({'REFRESH_RATE': int}) # Maximum refresh rate in Hz
 

@@ -482,12 +482,7 @@ def compute_features(cfg):
     if max(picks) > len(raw.ch_names):
         logger.error('"picks" has a channel index %d while there are only %d channels.' % (max(picks), len(raw.ch_names)))
         raise ValueError
-    if hasattr(cfg, 'SP_CHANNELS') and cfg.SP_CHANNELS is not None:
-        logger.warning('SP_CHANNELS parameter is not supported yet. Will be set to PICKED_CHANNELS.')
-    if hasattr(cfg, 'TP_CHANNELS') and cfg.TP_CHANNELS is not None:
-        logger.warning('TP_CHANNELS parameter is not supported yet. Will be set to PICKED_CHANNELS.')
-    if hasattr(cfg, 'NOTCH_CHANNELS') and cfg.NOTCH_CHANNELS is not None:
-        logger.warning('NOTCH_CHANNELS parameter is not supported yet. Will be set to PICKED_CHANNELS.')
+
     if 'decim' not in cfg.FEATURES['PSD']:
         cfg.FEATURES['PSD']['decim'] = 1
         logger.warning('PSD["decim"] undefined. Set to 1.')

@@ -8,7 +8,7 @@ For example, if a single decoder takes 40ms to compute the likelihoods of a sing
 100 Hz decoding rate can be achieved reliably using 4 cpu cores.
 
 TODO:
-Allow self.ref_new to be a list.
+Add re-referencing feature.
 
 TODO:
 Use Pathos to overcome non-picklable class object limitations.
@@ -88,6 +88,7 @@ class BCIDecoder(object):
         classifier: classifier file
         spatial: spatial filter to use
         buffer_size: length of the signal buffer in seconds
+        fake: create a mock decoder if fake is True
         """
 
         self.classifier = classifier
@@ -131,21 +132,10 @@ class BCIDecoder(object):
                 raise RuntimeError
 
             # Map channel indices based on channel names of the streaming server
-            self.spatial_ch = model['spatial_ch']
-            self.spectral_ch = model['spectral_ch']
-            self.notch_ch = model['notch_ch']
-            #self.ref_ch = model['ref_ch'] # not supported yet
             self.ch_names = self.sr.get_channel_names()
-            mc = model['ch_names']
-            self.picks = [self.ch_names.index(mc[p]) for p in model['picks']]
-            if self.spatial_ch is not None:
-                self.spatial_ch = [self.ch_names.index(mc[p]) for p in model['spatial_ch']]
-            if self.spectral_ch is not None:
-                self.spectral_ch = [self.ch_names.index(mc[p]) for p in model['spectral_ch']]
-            if self.notch_ch is not None:
-                self.notch_ch = [self.ch_names.index(mc[p]) for p in model['notch_ch']]
+            self.picks = [self.ch_names.index(ch) for ch in model['ch_names']]
 
-            # PSD buffer
+            # Debug: optional PSD buffer
             #psd_temp = self.psde.transform(np.zeros((1, len(self.picks), self.w_frames // self.decim)))
             #self.psd_shape = psd_temp.shape
             #self.psd_size = psd_temp.size
@@ -156,7 +146,7 @@ class BCIDecoder(object):
 
             logger.info_green('Loaded classifier %s (sfreq=%.3f, decim=%d)' % (' vs '.join(self.label_names), self.sfreq, self.decim))
         else:
-            # Fake left-right decoder
+            # Mock left-right decoder
             model = None
             self.psd_shape = None
             self.psd_size = None
@@ -213,18 +203,15 @@ class BCIDecoder(object):
             t_prob = ts[-1]
             w = w.T  # -> channels x times
 
-            # re-reference channels
-            # TODO: add re-referencing function to preprocess()
-
-            # apply filters. Important: maintain the original channel order at this point.
-            w = pu.preprocess(w, sfreq=self.sfreq, spatial=self.spatial, spatial_ch=self.spatial_ch,
-                          spectral=self.spectral, spectral_ch=self.spectral_ch, notch=self.notch,
-                          notch_ch=self.notch_ch, multiplier=self.multiplier, decim=self.decim)
-
             # select the same channels used for training
             w = w[self.picks]
 
-            # debug: show max - min
+            # apply filters on picked channels
+            w = pu.preprocess(w, sfreq=self.sfreq, spatial=self.spatial, spatial_ch=None,
+                spectral=self.spectral, spectral_ch=None, notch=self.notch,
+                notch_ch=None, multiplier=self.multiplier, decim=self.decim)
+
+            # debug: show min-max stats
             # c=1; print( '### %d: %.1f - %.1f = %.1f'% ( self.picks[c], max(w[c]), min(w[c]), max(w[c])-min(w[c]) ) )
 
             # psd = channels x freqs
@@ -268,8 +255,8 @@ class BCIDecoder(object):
         -------
         The latest computed PSD
         """
+        #return self.psd_buffer[-1].reshape((1, -1))
         raise NotImplementedError('Sorry! PSD buffer is under testing.')
-        return self.psd_buffer[-1].reshape((1, -1))
 
     def is_ready(self):
         """
@@ -346,8 +333,8 @@ class BCIDecoderDaemon(object):
                 raise RuntimeError
             self.labels = [tdef.by_name[t] for t in fake_dirs]
             self.label_names = [tdef.by_value[v] for v in self.labels]
-            self.startmsg = '** WARNING: FAKE ' + self.startmsg
-            self.stopmsg = 'FAKE ' + self.stopmsg
+            self.startmsg = '** WARNING: MOCK ' + self.startmsg
+            self.stopmsg = 'MOCK ' + self.stopmsg
 
         self.psdlock = mp.Lock()
         self.reset()

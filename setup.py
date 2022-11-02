@@ -1,17 +1,20 @@
-import os
-import sys
 from setuptools import find_packages, setup
 
 # backward compatibility for old pycnbi users
+'''
+# symlink pycnbi to neurodecode
+import os
+import sys
 if not os.path.exists('./pycnbi'):
     if sys.platform.startswith('win'):
         os.system('mklink pycnbi neurodecode /J')
     else:
         os.symlink('./neurodecode', './pycnbi', True)
+'''
 
 setup(
     name='neurodecode',
-    version='1.1',
+    version='2.0',
     author='Kyuhwa Lee, Arnaud Desvachez',
     author_email='lee.kyuh@gmail.com, arnaud.desvachez@gmail.com',
     license='The GNU General Public License',

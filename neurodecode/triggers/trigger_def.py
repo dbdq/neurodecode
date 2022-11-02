@@ -33,19 +33,10 @@ def trigger_def(ini_file, verbose=False):
                     print(attr, getattr(self, attr))
 
     if not os.path.exists(ini_file):
-        search_path = []
-        path_ini = qc.parse_path(ini_file)
-        path_self = qc.parse_path(__file__)
-        search_path.append(ini_file + '.ini')
-        search_path.append('%s/%s' % (path_self.dir, path_ini.name))
-        search_path.append('%s/%s.ini' % (path_self.dir, path_ini.name))
-        for ini_file in search_path:
-            if os.path.exists(ini_file):
-                if verbose:
-                    logger.info('Found trigger definition file %s' % ini_file)
-                break
+        if os.path.exists(ini_file):
+            logger.info('Found trigger definition file %s' % ini_file)
         else:
-            raise IOError('Trigger event definition file %s not found' % ini_file)
+            raise FileNotFoundError('Trigger event definition file %s not found' % ini_file)
     config = ConfigParser(inline_comment_prefixes=('#', ';'))
     config.optionxform = str
     config.read(ini_file)

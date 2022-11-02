@@ -121,8 +121,8 @@ To run this example, copy the sample data and codes to a new folder and cd into 
 Simulate real-time decoding from the brain. We are streaming the data using nd_stream_player script above but the receiver
 is source-agnostic which allows the full simulation of replaying and processing the data.
 ```
-nd_stream_recorder $PWD/records # for Linux
-nd_stream_recorder %CD%\records # for Windows
+nd_stream_recorder $PWD # for Linux
+nd_stream_recorder %CD% # for Windows
 ```
 This step can be skipped if you create a folder ./fif/ and copy the sample fif file into ./fif/.
  

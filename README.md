@@ -155,7 +155,7 @@ from the stream player terminal. Other events such as rest is undefined and will
 Sample decoder output with probabilities and the corresponding bar position, which represents the accumulated probabilities.
 
 ![image](https://user-images.githubusercontent.com/6797783/199514155-a94bbb71-c2dc-43d5-81e8-2bd4916a05e4.png)  
-Events emitted from the stream player.
+Example of events being emitted from the stream player.
 
 There are still plenty of possibilities to optimize the speed in many parts of the code. Any contribution is welcome. Please contact lee.kyuh@gmail.com for any comment / feedback.
 

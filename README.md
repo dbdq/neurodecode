@@ -72,8 +72,8 @@ python setup.py develop
 ```
 Add "scripts" directory to PATH environment variable for convenient access to commonly used scripts.
 
-## PyQt version problem
-The Qt library is very sensitive to version and needs to be compatible with all dependencies.
+### PyQt version problem
+The Qt API is very sensitive to version and needs to be compatible with all dependencies.
 If you experience pyqtgraph complaining incompatible PyQt version (e.g. PyQt < 5.12), try:
 ```
 conda remove pyqt
@@ -82,12 +82,12 @@ pip install -U PyQt5
 This can be caused by Anaconda not having the latest PyQt version.
 
 
-## For Windows users, increase timer resolution
+### For Windows users, increase timer resolution
 The default timer resolution in some Windows versions is 16 ms, which can limit the precision of timings. It is recommended to run the following tool and set the resolution to 1 ms or lower:
 [https://vvvv.org/contribution/windows-system-timer-tool](https://vvvv.org/contribution/windows-system-timer-tool)
 
 
-## Hardware triggering without legacy parallel port
+### Hardware triggering without legacy parallel port
 We have also developed an Arduino-based triggering system as we wanted to send triggers to a parallel port using standard USB ports. We achieved sub-millisecond extra latency compared to physical parallel port (150 +- 25 us). Experimental results using oscilloscope can be found in "doc" folder. The package can be downloaded by:
 ```
 git clone https://github.com/dbdq/arduino-trigger.git
@@ -95,7 +95,7 @@ git clone https://github.com/dbdq/arduino-trigger.git
 The customized firmware should be installed on Arduino Micro and the circuit design included in the document folder should be printed to a circuit board.
 
 
-## For g.USBamp users
+### For g.USBamp users
 The following customized acquisition server is needed instead of default LSL app to receive the trigger channel as part of signal streaming channels:
 ```
 git clone https://github.com/dbdq/gUSBamp_pycnbi.git
@@ -103,59 +103,71 @@ git clone https://github.com/dbdq/gUSBamp_pycnbi.git
 because the default gUSBamp LSL server do not stream event channel as part of the signal stream but as a separate server. The customized version supports simultaneous signal+event channel streaming. 
 
 
-## For AntNeuro eego users
+### For AntNeuro eego users
 Use the OpenVibe acquisition server and make sure to check "LSL output" in preference.  If you don't see "eego" from the device selection, it's probably because you didn't install the additional drivers when you installed OpenVibe.
 
-
+<br>
+<br>
 
 # Running examples
 
 To run this example, copy the sample data and codes to a new folder and cd into this folder.
 
-1. Replay data in real-time as if acquiring signals from brain with a chunk size of 8  
+### 1. Play data
+Replay a pre-recorded EEG recording sample in real-time as if acquiring signals from brain with a chunk size of 8.
+The sample data was recorded using a 24-channel EEG system from a participant doing a left and right hand motor imagery.
+The hardware events recorded during the experiment is also streamed via LSL network.
+
 ```nd_stream_player mi_left_right.fif 8```
 
+Screenshot of setting up an LSL server and streaming the recorded data.
 ![image](https://user-images.githubusercontent.com/6797783/199510832-c10b7df9-193b-4396-a671-15f6f8df0226.png)
 
-2. Record streaming data  
-Simulate real-time decoding from the brain. We are streaming the data using nd_stream_player script above but the receiver
-is source-agnostic which allows the full simulation of replaying and processing the data.
+### 2. Record data  
+Simulate real-time decoding from the brain. We are streaming the data using nd_stream_player script above while
+the receiver is source-agnostic, allowing the full simulation of replaying and the validation of data processing.  
+This step can be skipped if you create a folder ./fif/ and copy the sample fif file into ./fif/.
+
 ```
 nd_stream_recorder $PWD # for Linux
 nd_stream_recorder %CD% # for Windows
 ```
-This step can be skipped if you create a folder ./fif/ and copy the sample fif file into ./fif/.
- 
 ![image](https://user-images.githubusercontent.com/6797783/199511174-abb1ac03-eadc-488d-833a-6e303a93e331.png)
 
-3. Visualise signals (choose StreamPlayer from the list)  
+### 3. Visualise signals (choose StreamPlayer from the list)  
 ```nd_stream_viewer```
 
+Sample visualisation of streamed signals. Cursor keys allow different amplitude and time scalings.
 ![image](https://user-images.githubusercontent.com/6797783/199509891-a0f30cfd-c589-4004-89f0-c71ff08b4071.png)
 
-4. Run an offline protocol for training
-Runs an offline training protocol. This step is just for explanation purpose and can be skipped.
+### 4. Run an offline protocol for training
+Runs an offline training protocol. This step is just for explanation purpose and can be skipped.  
 ```nd_train_mi ./config_offline.py```
 
+Snapshot of the offline protocol.  
 ![image](https://user-images.githubusercontent.com/6797783/199511602-6bec54d0-50dd-485c-8d3e-6fa7621cc773.png)
 
-5. Train a decoder  
-Train a decoder using the fif file with defined events. In this example, it is left (event 11) vs right (event 9) hand motor imagery.
-```nd_trainer ./config_trainer.py```
+### 5. Train a decoder  
+Train a decoder using the fif file with defined events. In this example, it is left (event 11) vs right (event 9) hand motor imagery.  
 Events are defined in mi_left_right_events.ini file.
 
-6. Run an online protocol and test a decoder  
-```nd_test_mi config_online.py```
+```nd_trainer ./config_trainer.py```
+
+### 6. Run an online protocol for testing
 The provided sample is set to 60 seconds time-out without early termination so you can see
 the decoder output changes to left or right when the left (event 11) or right(event 9) is emitted 
 from the stream player terminal. Other events such as rest is undefined and will behave in random direction.
 
-![image](https://user-images.githubusercontent.com/6797783/199517521-de33e4f2-92bf-421f-8afc-9eee5c899a04.png)  
-![image](https://user-images.githubusercontent.com/6797783/199518166-67f8a4ea-dde9-4544-b95d-80ed5f0526aa.png)  
-Sample decoder output with probabilities and the corresponding bar position, which represents the accumulated probabilities.
+```nd_test_mi config_online.py```
 
+Snapshot of the protocol showing the bar position.  
+![image](https://user-images.githubusercontent.com/6797783/199517521-de33e4f2-92bf-421f-8afc-9eee5c899a04.png)  
+
+Sample decoder output with probabilities and the corresponding bar position, which represents the accumulated probabilities.  
+![image](https://user-images.githubusercontent.com/6797783/199518166-67f8a4ea-dde9-4544-b95d-80ed5f0526aa.png)  
+
+Example of events being emitted from the stream player.  
 ![image](https://user-images.githubusercontent.com/6797783/199514155-a94bbb71-c2dc-43d5-81e8-2bd4916a05e4.png)  
-Example of events being emitted from the stream player.
 
 There are still plenty of possibilities to optimize the speed in many parts of the code. Any contribution is welcome. Please contact lee.kyuh@gmail.com for any comment / feedback.
 

@@ -134,7 +134,7 @@ nd_stream_recorder %CD% # for Windows
 ```
 ![image](https://user-images.githubusercontent.com/6797783/199511174-abb1ac03-eadc-488d-833a-6e303a93e331.png)
 
-### 3. Visualise signals (choose StreamPlayer from the list)  
+### 3. Real-time signal visualisation (choose StreamPlayer from the list)  
 ```nd_stream_viewer```
 
 Sample visualisation of streamed signals. Cursor keys allow different amplitude and time scalings.

@@ -150,8 +150,9 @@ The provided sample is set to 60 seconds time-out without early termination so y
 the decoder output changes to left or right when the left (event 11) or right(event 9) is emitted 
 from the stream player terminal. Other events such as rest is undefined and will behave in random direction.
 
-![image](https://user-images.githubusercontent.com/6797783/199511564-c4f2c6ed-8372-4cb3-86d2-a7306caf2f80.png)  
-Example decoder output.
+![image](https://user-images.githubusercontent.com/6797783/199517521-de33e4f2-92bf-421f-8afc-9eee5c899a04.png)  
+![image](https://user-images.githubusercontent.com/6797783/199518166-67f8a4ea-dde9-4544-b95d-80ed5f0526aa.png)
+Sample decoder output with probabilities and the corresponding bar position, which represents the accumulated probabilities.
 
 ![image](https://user-images.githubusercontent.com/6797783/199514155-a94bbb71-c2dc-43d5-81e8-2bd4916a05e4.png)  
 Events emitted from the stream player.

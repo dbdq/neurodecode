@@ -102,6 +102,7 @@ def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_sta
             t_wait = t_start + idx_chunk * t_chunk - time.time()
             if t_wait > 0.001:
                 time.sleep(t_wait)
+        
         outlet.push_chunk(data)
         logger.debug('[%8.3fs] sent %d samples (LSL %8.3f)' % (time.perf_counter(), len(data), pylsl.local_clock()))
         if event_ch is not None:

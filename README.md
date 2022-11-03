@@ -111,7 +111,7 @@ Use the OpenVibe acquisition server and make sure to check "LSL output" in prefe
 
 # Running examples
 
-To run this example, copy the sample data and codes to a new folder and cd into this folder.
+To run this example, copy the /sample folder to your local folder and cd into it.
 
 ### 1. Play data
 Replay a pre-recorded EEG recording sample in real-time as if acquiring signals from brain with a chunk size of 8.

@@ -14,7 +14,7 @@ if not os.path.exists('./pycnbi'):
 
 setup(
     name='neurodecode',
-    version='2.0',
+    version='2.0.1',
     author='Kyuhwa Lee, Arnaud Desvachez',
     author_email='lee.kyuh@gmail.com, arnaud.desvachez@gmail.com',
     license='The GNU General Public License',

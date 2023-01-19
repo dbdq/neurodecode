@@ -25,28 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import os
-import sys
-import imp
 import mne
 import mne.io
-import neurodecode
-import timeit
-import platform
-import traceback
 import numpy as np
 import multiprocessing as mp
-import sklearn.metrics as skmetrics
 import neurodecode.utils.q_common as qc
 import neurodecode.utils.pycnbi_utils as pu
 from mne import Epochs, pick_types
 from neurodecode import logger
-from neurodecode.decoder.rlda import rLDA
-from builtins import input
-from IPython import embed  # for debugging
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import GradientBoostingClassifier
-from xgboost import XGBClassifier
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 
 
 def slice_win(epochs_data, w_starts, w_length, psde, picks=None, title=None, flatten=True, preprocess=None, verbose=False):
@@ -447,7 +433,7 @@ def compute_features(cfg):
     triggers = {cfg.tdef.by_value[c]:c for c in trigger_def_int}
 
     # Pick channels
-    if cfg.PICKED_CHANNELS is None:
+    if cfg.PICKED_CHANNELS is None or len(cfg.PICKED_CHANNELS) == 0:
         picks = [int(x) for x in pick_types(raw.info, stim=False, eeg=True)]
         chlist = [raw.ch_names[x] for x in picks]
     else:
@@ -462,7 +448,7 @@ def compute_features(cfg):
                 logger.error('PICKED_CHANNELS has a value of unknown type %s.\nPICKED_CHANNELS=%s' % (type(c), cfg.PICKED_CHANNELS))
                 raise RuntimeError
 
-    if cfg.EXCLUDED_CHANNELS is not None:
+    if cfg.EXCLUDED_CHANNELS is not None or len(cfg.EXCLUDED_CHANNELS) == 0:
         if len(set(cfg.EXCLUDED_CHANNELS) & set(cfg.PICKED_CHANNELS)) > 0:
             logger.error('in config, EXCLUDED_CHANNELS and PICKED_CHANNELS must not contain the same channel')
             raise ValueError
@@ -504,8 +490,6 @@ def compute_features(cfg):
     except:
         logger.exception('Problem while epoching.')
         raise RuntimeError
-
-    label_set = np.unique(triggers.values())
 
     # Compute features
     if cfg.FEATURES['selected'] == 'PSD':

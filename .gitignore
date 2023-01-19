@@ -2,7 +2,9 @@ pycnbi
 neurodecode/glass/bgi-cnbi/app/build
 neurodecode/glass/bgi-cnbi/build
 neurodecode/build
+neurodecode.egg-info
 build
+dist
 obj
 __pycache__
 .DS_Store

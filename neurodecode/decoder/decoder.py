@@ -217,7 +217,7 @@ class BCIDecoder(object):
             # psd = channels x freqs
             psd = self.psde.transform(w.reshape((1, w.shape[0], w.shape[1])))
 
-            # make a feautre vector and classify
+            # make a feature vector
             feats = np.concatenate(psd[0]).reshape(1, -1)
 
             # compute likelihoods

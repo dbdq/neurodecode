@@ -448,7 +448,7 @@ def compute_features(cfg):
                 logger.error('PICKED_CHANNELS has a value of unknown type %s.\nPICKED_CHANNELS=%s' % (type(c), cfg.PICKED_CHANNELS))
                 raise RuntimeError
 
-    if cfg.EXCLUDED_CHANNELS is not None or len(cfg.EXCLUDED_CHANNELS) == 0:
+    if cfg.EXCLUDED_CHANNELS is not None and len(cfg.EXCLUDED_CHANNELS) > 0:
         if len(set(cfg.EXCLUDED_CHANNELS) & set(cfg.PICKED_CHANNELS)) > 0:
             logger.error('in config, EXCLUDED_CHANNELS and PICKED_CHANNELS must not contain the same channel')
             raise ValueError
@@ -486,7 +486,7 @@ def compute_features(cfg):
         else:
             # Usual method: single epoch range
             epochs_train = Epochs(raw, events, triggers, tmin=cfg.EPOCH[0], tmax=cfg.EPOCH[1], proj=False,
-                picks=picks, baseline=None, preload=True, verbose=False, detrend=None, on_missing='warning')
+                picks=picks, baseline=None, preload=True, verbose=False, detrend=None, on_missing='warn')
     except:
         logger.exception('Problem while epoching.')
         raise RuntimeError

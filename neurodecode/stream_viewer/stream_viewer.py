@@ -32,7 +32,7 @@ import neurodecode
 import neurodecode.utils.q_common as qc
 import neurodecode.utils.pycnbi_utils as pu
 import multiprocessing as mp
-from PyQt5.QtWidgets import QMainWindow,QApplication, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPainter
 from pathlib import Path
@@ -960,6 +960,7 @@ class Scope(QMainWindow):
         if (self.ui.pushButton_stoprec.isEnabled()):
             subprocess.Popen(["cl_rpc", "closexdf"], close_fds=True)
 
+        QApplication.instance().closeAllWindows()
         # ----------------------------------------------------------------------------------------------------
         # 		END OF EVENT HANDLERS
         # ----------------------------------------------------------------------------------------------------

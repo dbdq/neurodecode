@@ -14,7 +14,7 @@ if not os.path.exists('./pycnbi'):
 
 setup(
     name='neurodecode',
-    version='2.0.2',
+    version='2.0.4',
     author='Kyuhwa Lee, Arnaud Desvachez',
     author_email='lee.kyuh@gmail.com, arnaud.desvachez@gmail.com',
     license='The GNU General Public License',
@@ -54,14 +54,13 @@ setup(
         'nd_fif_resample=neurodecode.utils.fif_resample:main',
         'nd_fif2mat=neurodecode.utils.fif2mat:main',
         'nd_add_lsl_events=neurodecode.utils.add_lsl_events:main',
-        'nd_parse_features=neurodecode.utils.parse_features:main',
+        'nd_parse_features=neurodecode.analysis.parse_features:main',
         'nd_convert2fif=neurodecode.utils.convert2fif:main',
         'nd_train_mi=neurodecode.protocols.mi.train_mi:main',
         'nd_test_mi=neurodecode.protocols.mi.test_mi:main',
         'nd_stream_player=neurodecode.stream_player.stream_player:main',
         'nd_stream_recorder=neurodecode.stream_recorder.stream_recorder:main',
         'nd_tfr_export=neurodecode.analysis.tfr_export:main',
-        'nd_tfr_export_each_file=neurodecode.analysis.tfr_export_each_file:main',
         'nd_trainer=neurodecode.decoder.trainer:main',
         'nd_decoder=neurodecode.decoder.decoder:main'
     ]}

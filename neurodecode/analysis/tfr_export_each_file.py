@@ -2,8 +2,7 @@ from __future__ import print_function, division
 
 """
 Time-frequency analysis using Morlet wavelets or multitapers
-TFR computed on each raw file, from the beginning until the end.
-The result is the grand average of TFRs over all epochs.
+TFRs are computed on each the whole fif file, from the beginning until the end.
 
 Kyuhwa Lee, 2018
 
@@ -119,7 +118,7 @@ def get_tfr(fif_file, cfg, tfr, n_jobs=1):
             title = 'Channel %s' % (ch_name)
             # mode= None | 'logratio' | 'ratio' | 'zscore' | 'mean' | 'percent'
             fig = power.plot([ch], baseline=cfg.BS_TIMES, mode=cfg.BS_MODE, show=False,
-                colorbar=True, title=title, vmin=cfg.VMIN, vmax=cfg.VMAX, dB=False)
+                colorbar=True, title=title, vmin=cfg.VMIN, vmax=cfg.VMAX, dB=False)[0]
             fout = '%s/%s-%s-%s.png' % (export_dir, fname, cfg.SP_FILTER, ch_name)
             fig.savefig(fout)
             logger.info('Exported %s' % fout)

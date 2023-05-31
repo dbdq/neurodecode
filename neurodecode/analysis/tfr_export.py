@@ -233,7 +233,7 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
 
                     # mode= None | 'logratio' | 'ratio' | 'zscore' | 'mean' | 'percent'
                     fig = power[evname].plot([ch], baseline=cfg.BS_TIMES, mode=cfg.BS_MODE, show=False,
-                        colorbar=True, title=title, vmin=cfg.VMIN, vmax=cfg.VMAX, dB=False)
+                        colorbar=True, title=title, vmin=cfg.VMIN, vmax=cfg.VMAX, dB=False)[0]
                     fout = '%s/%s-%s-%s-%s.png' % (export_dir, file_prefix, cfg.SP_FILTER, evname, chname)
                     fig.savefig(fout)
                     plt.close()
@@ -261,7 +261,7 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
                         title = 'Peri-event %s - Channel %s, Trial %d' % (evname, chname, ep + 1)
                         # mode= None | 'logratio' | 'ratio' | 'zscore' | 'mean' | 'percent'
                         fig = power[evname].plot([ch], baseline=cfg.BS_TIMES, mode=cfg.BS_MODE, show=False,
-                            colorbar=True, title=title, vmin=cfg.VMIN, vmax=cfg.VMAX, dB=False)
+                            colorbar=True, title=title, vmin=cfg.VMIN, vmax=cfg.VMAX, dB=False)[0]
                         fout = '%s/%s-%s-%s-%s-ep%02d.png' % (export_dir, file_prefix, cfg.SP_FILTER, evname, chname, ep + 1)
                         fig.savefig(fout)
                         plt.close()
@@ -280,7 +280,7 @@ def get_tfr(cfg, recursive=False, n_jobs=1):
 
             # mode= None | 'logratio' | 'ratio' | 'zscore' | 'mean' | 'percent'
             fig = df.plot([ch], baseline=cfg.BS_TIMES, mode=cfg.BS_MODE, show=False,
-                          colorbar=True, title=title, vmin=3.0, vmax=-3.0, dB=False)
+                colorbar=True, title=title, vmin=3.0, vmax=-3.0, dB=False)[0] # this code needs testing
             fout = '%s/%s-%s-diff-%s-%s-%s.jpg' % (export_dir, file_prefix, cfg.SP_FILTER, labels[0], labels[1], chname)
             logger.info('Exporting to %s' % fout)
             fig.savefig(fout)

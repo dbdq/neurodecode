@@ -22,21 +22,78 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
-import sys
 import os
-import gzip
-import time
+import sys
 import cv2
+import time
+import gzip
 import numpy as np
-import neurodecode
-import neurodecode.glass.bgi_client as bgi_client
 import neurodecode.utils.q_common as qc
 from neurodecode import logger
-from builtins import input
 try:
     import cPickle as pickle  # Python 2 (cPickle = C version of pickle)
 except ImportError:
     import pickle  # Python 3 (C version is the default)
+
+
+def combine_images_OLD(image_paths, labels, pickle_file, resize=None):
+    """
+    Save images as a single pickle file for faster loading
+
+    TODO: Generalise directions to argument-based names
+
+    Input
+    -----
+    image_paths: list of directories for each label
+    labels: list of labels that correspond to image_paths
+    pickle_file: combined output file
+    resize: [width, height] or None for original size
+    """
+    left_image_path = '%s/left' % image_path
+    right_image_path = '%s/right' % image_path
+    tm = qc.Timer()
+    logger.info('Reading images from %s' % left_image_path )
+    left_images = read_images(left_image_path, resize)
+    logger.info('Reading images from %s' % right_image_path)
+    right_images = read_images(right_image_path, resize)
+    images = {'left_images':left_images, 'right_images':right_images}
+    logger.info('Merging and compressing ...')
+    qc.save_obj(pickle_file, images)
+    ''' compressing and decompressing turns out to be too slow
+    g = gzip.compress(pickle.dumps(images))
+    with gzip.open(pickle_file, "wb") as f:
+        f.write(g)
+    '''
+    logger.info('Took %.1f s' % tm.sec())
+    return
+
+
+def combine_images(image_paths, labels, pickle_file, resize=None):
+    """
+    Save images as a single pickle file for faster loading
+
+    TODO: Generalise directions to argument-based names
+
+    Input
+    -----
+    image_paths: list of directories for each label
+    labels: list of labels that correspond to image_paths
+    pickle_file: combined output file
+    resize: [width, height] or None for original size
+    """
+    tm = qc.Timer()
+    images = {}
+    for i, label in enumerate(labels):
+        logger.info('[%s] Reading images from %s' % (label, image_paths[i]))
+        images[label] = read_images(image_paths[i], resize)
+    qc.save_obj(pickle_file, images)
+    ''' compressing and decompressing turns out to be too slow
+    logger.info('Merging and compressing ...')
+    g = gzip.compress(pickle.dumps(images))
+    with gzip.open(pickle_file, "wb") as f:
+        f.write(g)
+    '''
+    logger.info('Took %.1f s' % tm.sec())
 
 
 def read_images(img_path, screen_size=None):
@@ -74,25 +131,24 @@ def read_images(img_path, screen_size=None):
             img_out = img
         pnglist.append(img_out)
         print('.', end='')
-    logger.info('Done loading images.')
+    print()
     return pnglist
 
 
 class ImageVisual(object):
     # Default setting
-    color = dict(G=(20, 140, 0), B=(255, 90, 0), R=(0, 50, 200), Y=(0, 215, 235), K=(0, 0, 0),\
-                 W=(255, 255, 255), w=(200, 200, 200))
+    color = dict(G=(20, 140, 0), B=(255, 90, 0), R=(0, 50, 200), Y=(0, 215, 235),
+        K=(0, 0, 0), W=(255, 255, 255), w=(200, 200, 200))
     barwidth = 100
     textlimit = 25  # maximum number of characters to show
 
-    def __init__(self, image_path, use_glass=False, glass_feedback=True, pc_feedback=True, screen_pos=None, screen_size=None):
+    def __init__(self, image_object, show_feedback=True, screen_pos=None, screen_size=None):
         """
         Input:
-            use_glass: if False, mock Glass will be used
-            glass_feedback: show feedback to the user?
-            pc_feedback: show feedback on the pc screen?
+            image_object: pickle file generated using combine_images()
+            show_feedback: show the feedback on the screen?
             screen_pos: screen position in (x,y)
-            screen_size: screen size in (x,y)
+            screen_size: screen size in (w,h)
         """
         # screen size and message setting
         if screen_size is None:
@@ -101,8 +157,8 @@ class ImageVisual(object):
                 screen_width = GetSystemMetrics(0)
                 screen_height = GetSystemMetrics(1)
             else:
-                screen_width = 1024
-                screen_height = 768
+                screen_width = 1920
+                screen_height = 1080
             screen_size = (screen_width, screen_height)
         else:
             screen_width, screen_height = screen_size
@@ -113,13 +169,12 @@ class ImageVisual(object):
 
         self.text_size = 2
         self.img = np.zeros((screen_height, screen_width, 3), np.uint8)
-        self.glass = bgi_client.GlassControl(mock=not use_glass)
-        self.glass.connect('127.0.0.1', 59900)
-        self.set_glass_feedback(glass_feedback)
-        self.set_pc_feedback(pc_feedback)
+        self.img_black = np.zeros((screen_height, screen_width, 3), np.uint8)
+        self.img_white = self.img_black + 255
+        self.set_show_feedback(show_feedback)
         self.set_cue_color(boxcol='B', crosscol='W')
-        self.width = self.img.shape[1]
-        self.height = self.img.shape[0]
+        self.width = self.img_black.shape[1]
+        self.height = self.img_black.shape[0]
         hw = int(self.barwidth / 2)
         self.cx = int(self.width / 2)
         self.cy = int(self.height / 2)
@@ -132,117 +187,76 @@ class ImageVisual(object):
         self.yr1 = self.cy + hw
         self.yr2 = self.yr1 + self.barwidth
 
-        if os.path.isdir(image_path):
-            # load images
-            left_image_path = '%s/left' % image_path
-            right_image_path = '%s/right' % image_path
-            tm = qc.Timer()
-            logger.info('Reading images from %s' % left_image_path )
-            self.left_images = read_images(left_image_path, screen_size)
-            logger.info('Reading images from %s' % right_image_path)
-            self.right_images = read_images(right_image_path, screen_size)
-            logger.info('Took %.1f s' % tm.sec())
-        else:
-            # load pickled images
-            # note: this is painfully slow in Pytohn 2 even with cPickle (3s vs 27s)
-            assert image_path[-4:] == '.pkl', 'The file must be of .pkl format'
-            logger.info('Loading image binary file %s ...' % image_path)
-            tm = qc.Timer()
-            with gzip.open(image_path, 'rb') as fp:
-                image_data = pickle.load(fp)
-            self.left_images = image_data['left_images']
-            self.right_images = image_data['right_images']
-            feedback_w = self.left_images[0].shape[1] / 2
-            feedback_h = self.left_images[0].shape[0] / 2
-            loc_x = [int(self.cx - feedback_w), int(self.cx + feedback_w)]
-            loc_y = [int(self.cy - feedback_h), int(self.cy + feedback_h)]
-            img_fit = np.zeros((screen_height, screen_width, 3), np.uint8)
+        # load pickled images
+        # note: this is painfully slow in Pytohn 2 even with cPickle (3s vs 27s)
+        assert image_object[-4:] == '.pkl', 'Check if the file is in Python Pickle format'
+        logger.info('Loading image binary file %s ...' % image_object)
+        tm = qc.Timer()
+        self.images = qc.load_obj(image_object)
+        image_shape = list(self.images.values())[0][0].shape # [height, width]
+        feedback_w = image_shape[1] / 2
+        feedback_h = image_shape[0] / 2
+        loc_x = [int(self.cx - feedback_w), int(self.cx + feedback_w)]
+        loc_y = [int(self.cy - feedback_h), int(self.cy + feedback_h)]
+        img_fit = np.zeros((screen_height, screen_width, 3), np.uint8)
 
-            # adjust to the current screen size
-            logger.info('Fitting images into the current screen size')
-            for i, img in enumerate(self.left_images):
-                img_fit = np.zeros((screen_height, screen_width, 3), np.uint8)
-                img_fit[loc_y[0]:loc_y[1], loc_x[0]:loc_x[1]] = img
-                self.left_images[i] = img_fit
-            for i, img in enumerate(self.right_images):
-                img_fit = np.zeros((screen_height, screen_width, 3), np.uint8)
-                img_fit[loc_y[0]:loc_y[1], loc_x[0]:loc_x[1]] = img
-                self.right_images[i] = img_fit
+        # adjust to the current screen size
+        if image_shape[0] != screen_height or image_shape[1] != screen_width:
+            logger.info('Fitting images to the screen size')
+            for label, image_batch in self.images.items():
+                for i, img in enumerate(image_batch):
+                    img_fit = np.zeros((screen_height, screen_width, 3), np.uint8)
+                    img_fit[loc_y[0]:loc_y[1], loc_x[0]:loc_x[1]] = img
+                    self.images[label][i] = img_fit
 
-            logger.info('Took %.1f s' % tm.sec())
-            logger.info('Done.')
+        logger.info('Loading took %.1f s.' % tm.sec())
         cv2.namedWindow("Protocol", cv2.WND_PROP_FULLSCREEN)
         cv2.moveWindow("Protocol", screen_x, screen_y)
         cv2.setWindowProperty("Protocol", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
+        #self.fill()
 
     def finish(self):
         cv2.destroyAllWindows()
-        self.glass.disconnect()
 
-    def set_glass_feedback(self, fb):
-        self.glass_feedback = fb
-
-    def set_pc_feedback(self, fb):
-        self.pc_feedback = fb
+    def set_show_feedback(self, fb):
+        self.show_feedback = fb
 
     def set_cue_color(self, boxcol='B', crosscol='W'):
         self.boxcol = self.color[boxcol]
         self.crosscol = self.color[crosscol]
 
-    def fill(self, fillcolor='K'):
-        self.glass.fill(fillcolor)
-        self.img = self.left_images[0]
+    def fill(self, label, fillcolor='K'):
+        self.img = self.images[label][0]
         self.update()
 
     # draw cue with custom colors
-    def draw_cue(self):
-        self.img = self.left_images[0]
+    def draw_cue(self, label):
+        self.img = self.images[label][0]
         self.update()
 
     # paints the new bar on top of the current image
-    def move(self, dir, dx, overlay=False, barcolor=None, caption='', caption_color='W'):
-        if barcolor is None:
-            if dx == self.xl2:
-                c = 'G'
-            else:
-                c = 'R'
-        else:
-            c = barcolor
-
-        self.glass.fullbar_color(c)
-        color = self.color[c]
-
-        if dir == 'L':
-            if self.pc_feedback:
-                self.img = self.left_images[dx]
-            if self.glass_feedback:
-                self.glass.move_bar(dir, dx, overlay)
-        elif dir == 'R':
-            if self.pc_feedback:
-                self.img = self.right_images[dx]
-            if self.glass_feedback:
-                self.glass.move_bar(dir, dx, overlay)
-        else:
-            logger.error('Unknown direction %s' % dir)
-        self.put_text(caption, caption_color)
+    def move(self, label, dx, caption='', caption_color='W'):
+        if label not in self.images:
+            logger.error('Undefined direction %s' % label)
+        elif self.show_feedback:
+            self.img = self.images[label][dx]
+        self.put_text(caption, color=caption_color)
         self.update()
 
-    def put_text(self, txt, color='W'):
+    def put_text(self, txt, color='W', x=None, y=None):
         self.img = self.img.copy()
         size_wh, baseline = cv2.getTextSize(txt, cv2.FONT_HERSHEY_DUPLEX, self.text_size, 2)
-        pos = (int(self.cx - size_wh[0] / 2), int(self.cy - size_wh[1] / 2))
-        cv2.putText(self.img, txt[:self.textlimit], pos,
-                    cv2.FONT_HERSHEY_DUPLEX, self.text_size, self.color[color], 2, cv2.LINE_AA)
+        if x is None:
+            x = int(self.cx - size_wh[0] / 2)
+        if y is None:
+            y = int(self.cy - size_wh[1] / 2)
+        pos = (x, y)
+        cv2.putText(self.img, txt[:self.textlimit], pos, cv2.FONT_HERSHEY_DUPLEX, self.text_size, self.color[color], 2, cv2.LINE_AA)
         self.update()
 
     def update(self):
+        """
+        Update the graphics and returns any captured key strokes
+        """
         cv2.imshow("Protocol", self.img)
-        #cv2.waitKey(1)  # at least 1 ms needed for CV to update window
-        time.sleep(0.0005)
-
-    # Glass functions
-    def glass_draw_cue(self):
-        self.glass.draw_cross()
-
-    def glass_fullbarcolor(self, color):
-        self.glass.set_fullbar_color(color)
+        return cv2.waitKey(1)

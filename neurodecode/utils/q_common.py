@@ -183,7 +183,7 @@ def sort_by_value(s, rev=False):
 
 def get_file_list(path, fullpath=True, recursive=False):
     """
-    Get files with or without full path.
+    Get files with or without full path in sorted order.
     """
     path = path.replace('\\', '/')
     if not path[-1] == '/': path += '/'

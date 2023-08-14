@@ -140,7 +140,6 @@ class ImageVisual(object):
     color = dict(G=(20, 140, 0), B=(255, 90, 0), R=(0, 50, 200), Y=(0, 215, 235),
         K=(0, 0, 0), W=(255, 255, 255), w=(200, 200, 200))
     barwidth = 100
-    textlimit = 25  # maximum number of characters to show
 
     def __init__(self, image_object, show_feedback=True, screen_pos=None, screen_size=None):
         """
@@ -167,7 +166,6 @@ class ImageVisual(object):
         else:
             screen_x, screen_y = screen_pos
 
-        self.text_size = 2
         self.img = np.zeros((screen_height, screen_width, 3), np.uint8)
         self.img_black = np.zeros((screen_height, screen_width, 3), np.uint8)
         self.img_white = self.img_black + 255
@@ -227,32 +225,29 @@ class ImageVisual(object):
 
     def fill(self, label, fillcolor='K'):
         self.img = self.images[label][0]
-        self.update()
 
     # draw cue with custom colors
     def draw_cue(self, label):
         self.img = self.images[label][0]
-        self.update()
 
     # paints the new bar on top of the current image
     def move(self, label, dx, caption='', caption_color='W'):
         if label not in self.images:
-            logger.error('Undefined direction %s' % label)
-        elif self.show_feedback:
+            logger.error('Undefined label %s' % label)
+        if self.show_feedback:
             self.img = self.images[label][dx]
-        self.put_text(caption, color=caption_color)
-        self.update()
+        if len(caption) > 0:
+            self.put_text(caption, color=caption_color)
 
-    def put_text(self, txt, color='W', x=None, y=None):
+    def put_text(self, txt, color='W', x=None, y=None, scale=2, thickness=1):
         self.img = self.img.copy()
-        size_wh, baseline = cv2.getTextSize(txt, cv2.FONT_HERSHEY_DUPLEX, self.text_size, 2)
+        size_wh, baseline = cv2.getTextSize(txt, cv2.FONT_HERSHEY_DUPLEX, scale, thickness)
         if x is None:
             x = int(self.cx - size_wh[0] / 2)
         if y is None:
             y = int(self.cy - size_wh[1] / 2)
         pos = (x, y)
-        cv2.putText(self.img, txt[:self.textlimit], pos, cv2.FONT_HERSHEY_DUPLEX, self.text_size, self.color[color], 2, cv2.LINE_AA)
-        self.update()
+        cv2.putText(self.img, txt, pos, cv2.FONT_HERSHEY_DUPLEX, scale, self.color[color], thickness, cv2.LINE_AA)
 
     def update(self):
         """

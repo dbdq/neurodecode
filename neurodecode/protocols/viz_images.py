@@ -242,7 +242,7 @@ class ImageVisual(object):
         if len(caption) > 0:
             self.put_text(caption, color=caption_color)
 
-    def put_text(self, txt, color='W', x=None, y=None, scale=2, thickness=1):
+    def put_text(self, txt, color='W', x=None, y=None, scale=1, thickness=1):
         self.img = self.img.copy()
         size_wh, baseline = cv2.getTextSize(txt, cv2.FONT_HERSHEY_DUPLEX, scale, thickness)
         if x is None:

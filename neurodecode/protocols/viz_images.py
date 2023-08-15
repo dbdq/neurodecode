@@ -211,7 +211,7 @@ class ImageVisual(object):
         cv2.namedWindow("Protocol", cv2.WND_PROP_FULLSCREEN)
         cv2.moveWindow("Protocol", screen_x, screen_y)
         cv2.setWindowProperty("Protocol", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
-        #self.fill()
+        self.blank()
 
     def finish(self):
         cv2.destroyAllWindows()
@@ -223,7 +223,10 @@ class ImageVisual(object):
         self.boxcol = self.color[boxcol]
         self.crosscol = self.color[crosscol]
 
-    def fill(self, label, fillcolor='K'):
+    def blank(self):
+        self.img *= 0
+
+    def fill(self, label):
         self.img = self.images[label][0]
 
     # draw cue with custom colors

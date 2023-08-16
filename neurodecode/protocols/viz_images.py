@@ -36,38 +36,6 @@ except ImportError:
     import pickle  # Python 3 (C version is the default)
 
 
-def combine_images_OLD(image_paths, labels, pickle_file, resize=None):
-    """
-    Save images as a single pickle file for faster loading
-
-    TODO: Generalise directions to argument-based names
-
-    Input
-    -----
-    image_paths: list of directories for each label
-    labels: list of labels that correspond to image_paths
-    pickle_file: combined output file
-    resize: [width, height] or None for original size
-    """
-    left_image_path = '%s/left' % image_path
-    right_image_path = '%s/right' % image_path
-    tm = qc.Timer()
-    logger.info('Reading images from %s' % left_image_path )
-    left_images = read_images(left_image_path, resize)
-    logger.info('Reading images from %s' % right_image_path)
-    right_images = read_images(right_image_path, resize)
-    images = {'left_images':left_images, 'right_images':right_images}
-    logger.info('Merging and compressing ...')
-    qc.save_obj(pickle_file, images)
-    ''' compressing and decompressing turns out to be too slow
-    g = gzip.compress(pickle.dumps(images))
-    with gzip.open(pickle_file, "wb") as f:
-        f.write(g)
-    '''
-    logger.info('Took %.1f s' % tm.sec())
-    return
-
-
 def combine_images(image_paths, labels, pickle_file, resize=None):
     """
     Save images as a single pickle file for faster loading
@@ -140,6 +108,7 @@ class ImageVisual(object):
     color = dict(G=(20, 140, 0), B=(255, 90, 0), R=(0, 50, 200), Y=(0, 215, 235),
         K=(0, 0, 0), W=(255, 255, 255), w=(200, 200, 200))
     barwidth = 100
+    window_name = 'Protocol'
 
     def __init__(self, image_object, show_feedback=True, screen_pos=None, screen_size=None):
         """
@@ -208,9 +177,9 @@ class ImageVisual(object):
                     self.images[label][i] = img_fit
 
         logger.info('Loading took %.1f s.' % tm.sec())
-        cv2.namedWindow("Protocol", cv2.WND_PROP_FULLSCREEN)
-        cv2.moveWindow("Protocol", screen_x, screen_y)
-        cv2.setWindowProperty("Protocol", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
+        cv2.namedWindow(self.window_name, cv2.WND_PROP_FULLSCREEN)
+        cv2.moveWindow(self.window_name, screen_x, screen_y)
+        cv2.setWindowProperty(self.window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
         self.blank()
 
     def finish(self):
@@ -256,5 +225,5 @@ class ImageVisual(object):
         """
         Update the graphics and returns any captured key strokes
         """
-        cv2.imshow("Protocol", self.img)
+        cv2.imshow(self.window_name, self.img)
         return cv2.waitKey(1)

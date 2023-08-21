@@ -54,6 +54,8 @@ def combine_images(image_paths, labels, pickle_file, resize=None):
     for i, label in enumerate(labels):
         logger.info('[%s] Reading images from %s' % (label, image_paths[i]))
         images[label] = read_images(image_paths[i], resize)
+        if len(images[label]) == 0:
+            logger.warn('No images were loaded for %s' % label)
     qc.save_obj(pickle_file, images)
     ''' compressing and decompressing turns out to be too slow
     logger.info('Merging and compressing ...')
@@ -105,7 +107,7 @@ def read_images(img_path, screen_size=None):
 
 class ImageVisual(object):
     # Default setting
-    color = dict(G=(20, 140, 0), B=(255, 90, 0), R=(0, 50, 200), Y=(0, 215, 235),
+    colors = dict(G=(20, 140, 0), B=(255, 90, 0), R=(0, 50, 200), Y=(0, 215, 235),
         K=(0, 0, 0), W=(255, 255, 255), w=(200, 200, 200))
     barwidth = 100
     window_name = 'Protocol'
@@ -188,21 +190,24 @@ class ImageVisual(object):
     def set_show_feedback(self, fb):
         self.show_feedback = fb
 
+    """ reserved for bar feedback """
     def set_cue_color(self, boxcol='B', crosscol='W'):
-        self.boxcol = self.color[boxcol]
-        self.crosscol = self.color[crosscol]
+        self.boxcol = self.colors[boxcol]
+        self.crosscol = self.colors[crosscol]
 
+    """ blank image """
     def blank(self):
-        self.img *= 0
+        self.img.fill(0)
 
-    def fill(self, label):
-        self.img = self.images[label][0]
+    """ fill image with specific color """
+    def fill(self, color):
+        self.img = np.full(self.img.shape, self.colors[color])
 
-    # draw cue with custom colors
+    """ draw cue with custom colors """
     def draw_cue(self, label):
         self.img = self.images[label][0]
 
-    # paints the new bar on top of the current image
+    """ show image that corresponds to the decoder probability (or score) """
     def move(self, label, dx, caption='', caption_color='W'):
         if label not in self.images:
             logger.error('Undefined label %s' % label)
@@ -211,6 +216,7 @@ class ImageVisual(object):
         if len(caption) > 0:
             self.put_text(caption, color=caption_color)
 
+    """ embed texts to the current image """
     def put_text(self, txt, color='W', x=None, y=None, scale=1, thickness=1):
         self.img = self.img.copy()
         size_wh, baseline = cv2.getTextSize(txt, cv2.FONT_HERSHEY_DUPLEX, scale, thickness)
@@ -219,11 +225,9 @@ class ImageVisual(object):
         if y is None:
             y = int(self.cy - size_wh[1] / 2)
         pos = (x, y)
-        cv2.putText(self.img, txt, pos, cv2.FONT_HERSHEY_DUPLEX, scale, self.color[color], thickness, cv2.LINE_AA)
+        cv2.putText(self.img, txt, pos, cv2.FONT_HERSHEY_DUPLEX, scale, self.colors[color], thickness, cv2.LINE_AA)
 
+    """ Update the graphics and return any captured key strokes """
     def update(self):
-        """
-        Update the graphics and returns any captured key strokes
-        """
         cv2.imshow(self.window_name, self.img)
         return cv2.waitKey(1)

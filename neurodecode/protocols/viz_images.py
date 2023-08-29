@@ -201,7 +201,7 @@ class ImageVisual(object):
 
     """ fill image with specific color """
     def fill(self, color):
-        self.img = np.full(self.img.shape, self.colors[color])
+        self.img = np.full(self.img.shape, self.colors[color], dtype=np.uint8)
 
     """ draw cue with custom colors """
     def draw_cue(self, label):

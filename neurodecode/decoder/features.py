@@ -434,7 +434,8 @@ def compute_features(cfg):
 
     # Pick channels
     if cfg.PICKED_CHANNELS is None or len(cfg.PICKED_CHANNELS) == 0:
-        picks = [int(x) for x in pick_types(raw.info, stim=False, eeg=True)]
+        picks = [int(x) for x in pick_types(raw.info, stim=False, eeg=True, meg=True, eog=True, ecg=True, emg=True, seeg=True, ecog=True, dbs=True, fnirs=True)]
+        print(list(pick_types(raw.info, stim=False)))
         chlist = [raw.ch_names[x] for x in picks]
     else:
         chlist = cfg.PICKED_CHANNELS
@@ -447,6 +448,8 @@ def compute_features(cfg):
             else:
                 logger.error('PICKED_CHANNELS has a value of unknown type %s.\nPICKED_CHANNELS=%s' % (type(c), cfg.PICKED_CHANNELS))
                 raise RuntimeError
+    if len(picks) == 0:
+        raise ValueError('No channels were selected. Please check your parameters.')
 
     if cfg.EXCLUDED_CHANNELS is not None and len(cfg.EXCLUDED_CHANNELS) > 0:
         if len(set(cfg.EXCLUDED_CHANNELS) & set(cfg.PICKED_CHANNELS)) > 0:

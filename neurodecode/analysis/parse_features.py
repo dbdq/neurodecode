@@ -62,15 +62,12 @@ def get_feature_scores(featfile, channels=None, freq_ranges=None, matfile=None):
                 ch = l.strip().split('\t')[1]
                 if ch not in channels:
                     channels.append(ch)
-        channels.sort()
 
     # build channel index lookup table
     ch2index = {ch:i for i, ch in enumerate(channels)}
 
     # initialise data structure
-    data = {'channel':np.zeros(len(channels)), 'ch_names':channels,
-        'raw':{ch:{} for ch in channels}, 'freq_ranges':freq_ranges}
-#        'norm':{ch:{} for ch in channels}}
+    data = {'channel':np.zeros(len(channels)), 'ch_names':channels, 'raw':{ch:{} for ch in channels}, 'freq_ranges':freq_ranges}
     for band in freq_ranges:
         data[band] = np.zeros(len(channels))
 
@@ -107,27 +104,41 @@ def get_feature_scores(featfile, channels=None, freq_ranges=None, matfile=None):
 
     return data
 
-def print_feature_scores(data, num_cols=8):
+def print_feature_scores(data, logfile=None, num_cols=8):
     """
-    print features with number of channels per line set by num_cols (default=8)
+    Print features with number of channels per line set by num_cols (default=8)
 
+    Optionally, export the results to a logfile is not None
     """
-    print('-- Feature importance distribution --')
+
+    # hepler function for compiling text outputs
+    output = []
+    def print_var(txt, to_screen=False):
+        if to_screen is True:
+            print(txt)
+        output.append(txt)
+        output.append('\n')
+
+    print_var('-- Feature importance distribution --')
     channels = data['ch_names']
     channels_split = []
-    for i in range(len(channels)):
+
+    # sort channels by importance and show in multiple rows
+    for i, ch in enumerate(np.argsort(data['channel'])[::-1]):
         if i % num_cols == 0:
             channels_split.append([])
-        channels_split[-1].append(i)
+        channels_split[-1].append(ch)
+
+    # print per band, per channel
     for i, chs in enumerate(channels_split):
         channels_subset = ['%6s' % channels[ch] for ch in chs]
         txt = 'bands   | ' + ' '.join(channels_subset)
         if i == (len(channels_split) - 1):
             txt += ' | per band'
         rowlen = len(txt)
-        print('=' * rowlen)
-        print(txt)
-        print('-' * rowlen)
+        print_var('=' * rowlen)
+        print_var(txt)
+        print_var('-' * rowlen)
         for band in data:
             if band in ['channel', 'raw', 'freq_ranges', 'ch_names']:
                 continue
@@ -138,14 +149,20 @@ def print_feature_scores(data, num_cols=8):
             txt = '%-7s | %s' % (band_name, ' '.join(band_scores))
             if i == (len(channels_split) - 1):
                 txt += ' | %6.2f' % np.sum(data[band])
-            print(txt)
+            print_var(txt)
         txt = []
         for ch_i in chs:
             txt.append('%6.2f' % data['channel'][ch_i])
         if i == (len(channels_split) - 1):
             txt.append('| %6.2f' % sum(data['channel']))
-        print('-' * rowlen)
-        print('per chan| %s' % ' '.join(txt))
+        print_var('-' * rowlen)
+        print_var('per chan| %s' % ' '.join(txt))
+
+        if logfile:
+            with open(logfile, 'w') as fout:
+                fout.writelines(output)
+        else:
+            print(''.join(output))
 
 def feature_info(featfile, channels=None, freq_ranges=None, matfile=None):
     """
@@ -167,7 +184,7 @@ def config_run(featfile=None):
 
 # sample code
 def sample_code():
-    FEATFILE = r'D:\data\MI\z2\LR\classifier\good_features.txt'
+    FEATFILE = 'good_features.txt'
     CHANNELS = ['C3', 'C4', 'Cz']
     FREQ_RANGES = dict(
         delta=[1, 4],
@@ -175,9 +192,7 @@ def sample_code():
         alpha=[8, 13],
         beta=[13, 30],
         lgamma=[30, 49])
-    #MATFILE = '%s/good_features.mat' % qc.parse_path(FEATFILE).dir
-    MATFILE = None
-    feature_info(FEATFILE, CHANNELS, FREQ_RANGES, MATFILE)
+    feature_info(FEATFILE, CHANNELS, FREQ_RANGES)
 
 def main():
     """

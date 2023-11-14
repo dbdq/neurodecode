@@ -666,9 +666,9 @@ def train_decoder(cfg, featdata, feat_file=None):
 def batch_run(cfg_module):
     cfg = pu.load_config(cfg_module)
     cfg = check_config(cfg)
-    run(cfg, interactive=True)
+    run(cfg)
 
-def run(cfg, interactive=False, cv_file=None, feat_file=None, logger=logger):
+def run(cfg, cv_file=None, feat_file=None, logger=logger):
     # add tdef object
     cfg.tdef = trigger_def(cfg.TRIGGER_FILE)
 
@@ -691,7 +691,7 @@ def main():
     Invoked from console
     """
     # Load parameters
-    if len(sys.argv) == 1:
+    if len(sys.argv) <= 1:
         print('Usage: %s config_module' % os.path.basename(__file__))
         return
 

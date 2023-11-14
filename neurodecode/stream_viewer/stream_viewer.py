@@ -442,14 +442,8 @@ class Scope(QMainWindow):
 
         # if self.updating==True: print( '##### ERROR: thread destroyed ? ######' )
         # self.updating= True
-
         try:
-            # data, self.ts_list= self.sr.inlets[0].pull_chunk(max_samples=self.config['sf']) # [frames][channels]
             data, self.ts_list = self.sr.acquire(blocking=False)
-
-            # TODO: check and change to these two lines if needed
-            #self.sr.acquire(blocking=False, decim=DECIM)
-            #data, self.ts_list = self.sr.get_window()
 
             if len(self.ts_list) == 0:
                 # self.eeg= None
@@ -459,7 +453,8 @@ class Scope(QMainWindow):
             n = self.config['eeg_channels']
             trg_ch = self.config['tri_channels']
             if trg_ch is not None:
-                self.tri = np.reshape(data[:, trg_ch], (-1, 1))  # samples x 1
+                #self.tri = np.reshape(data[:, trg_ch], (-1, 1))  # samples x 1
+                self.tri = data[:, trg_ch].reshape(-1) # samples
                 if DEBUG_TRIGGER:
                     try:
                         # show trigger value of a chunk

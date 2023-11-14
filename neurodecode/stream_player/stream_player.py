@@ -16,8 +16,6 @@ import os
 import sys
 import time
 import pylsl
-import numpy as np
-import neurodecode.utils.q_common as qc
 import neurodecode.utils.pycnbi_utils as pu
 from neurodecode.triggers.trigger_def import trigger_def
 from neurodecode import logger
@@ -50,14 +48,14 @@ def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_sta
     except ValueError:
         event_ch = None
     if raw is not None:
-        logger.info_green('Successfully loaded %s' % fif_file)
+        logger.info_green('Successfully loaded %s.' % fif_file)
         logger.info('Server name: %s' % server_name)
-        logger.info('Sampling frequency %.3f Hz' % sfreq)
-        logger.info('Number of channels : %d' % n_channels)
-        logger.info('Chunk size : %d' % chunk_size)
+        logger.info('Sampling frequency: %.3f Hz' % sfreq)
+        logger.info('Number of channels: %d' % n_channels)
+        logger.info('Chunk size: %d' % chunk_size)
         for i, ch in enumerate(raw.ch_names):
             logger.info('%d %s' % (i, ch))
-        logger.info('Trigger channel : %s' % event_ch)
+        logger.info('Trigger channel: %s' % event_ch)
     else:
         raise RuntimeError('Error while loading %s' % fif_file)
 
@@ -154,7 +152,7 @@ def sample_code():
     server_name = 'StreamPlayer'
     chunk_size = 8
     fif_file = '../../mi_left_right.fif'
-    stream_player(server_name, fif_file, chunk_size)
+    stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_start=False)
 
 # sample code
 if __name__ == '__main__':

@@ -24,7 +24,8 @@ def run(fif_file):
     raw, events = pu.load_raw(fif_file)
     print('Raw info: %s' % raw)
     print('Channels: %s' % ', '.join(raw.ch_names))
-    print('Events: %s' % set(events[:, 2]))
+    if len(events) > 0:
+        print('Events: %s' % set(events[:, 2]))
     print('Sampling freq: %.3f Hz' % raw.info['sfreq'])
     qc.print_c('\n>> Interactive mode start. Type quit or Ctrl+D to finish', 'g')
     qc.print_c('>> Variables: raw, events\n', 'g')

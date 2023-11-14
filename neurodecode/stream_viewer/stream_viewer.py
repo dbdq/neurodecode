@@ -374,7 +374,7 @@ class Scope(QMainWindow):
         # n_channels= self.sr.channels
 
         # 12 unsigned ints (4 bytes)
-        ########## TODO: assumkng 32 samples chunk => make it read from LSL header
+        ########## TODO: assuming 32 samples chunk => make it read from LSL header
         data = ['EEG', srate, ['L', 'R'], 32, len(self.sr.get_eeg_channels()),
             0, self.sr.get_trigger_channel(), None, None, None, None, None]
         logger.info('Trigger channel: %s' % self.sr.get_trigger_channel())

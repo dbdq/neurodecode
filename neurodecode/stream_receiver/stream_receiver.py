@@ -90,7 +90,7 @@ class StreamReceiver:
         """
         server_found = False
         amps = []
-        channels = 0
+        n_channels = 0
         while server_found == False:
             if self.amp_name is None and self.amp_serial is None:
                 logger.info("Looking for a streaming server...")
@@ -122,7 +122,7 @@ class StreamReceiver:
                     if 'USBamp' in amp_name:
                         logger.info('Found USBamp streaming server %s (type %s, amp_serial %s) @ %s.' % (amp_name, si.type(), amp_serial, si.hostname()))
                         self._lsl_tr_channel = 16
-                        channels += si.channel_count()
+                        n_channels += si.channel_count()
                         ch_list = pu.lsl_channel_list(inlet)
                         amps.append(si)
                         server_found = True
@@ -130,7 +130,7 @@ class StreamReceiver:
                     elif 'BioSemi' in amp_name:
                         logger.info('Found BioSemi streaming server %s (type %s, amp_serial %s) @ %s.' % (amp_name, si.type(), amp_serial, si.hostname()))
                         self._lsl_tr_channel = 0  # or subtract -6684927? (value when trigger==0)
-                        channels += si.channel_count()
+                        n_channels += si.channel_count()
                         ch_list = pu.lsl_channel_list(inlet)
                         amps.append(si)
                         server_found = True
@@ -138,16 +138,16 @@ class StreamReceiver:
                     elif 'SmartBCI' in amp_name:
                         logger.info('Found SmartBCI streaming server %s (type %s, amp_serial %s) @ %s.' % (amp_name, si.type(), amp_serial, si.hostname()))
                         self._lsl_tr_channel = 23
-                        channels += si.channel_count()
+                        n_channels += si.channel_count()
                         ch_list = pu.lsl_channel_list(inlet)
                         amps.append(si)
                         server_found = True
                         break
                     elif 'StreamPlayer' in amp_name:
                         logger.info('Found StreamPlayer streaming server %s (type %s, amp_serial %s) @ %s.' % (amp_name, si.type(), amp_serial, si.hostname()))
-                        self._lsl_tr_channel = 0
-                        channels += si.channel_count()
+                        n_channels += si.channel_count()
                         ch_list = pu.lsl_channel_list(inlet)
+                        self._lsl_tr_channel = find_event_channel(ch_names=ch_list)
                         amps.append(si)
                         server_found = True
                         break
@@ -155,7 +155,7 @@ class StreamReceiver:
                         logger.info('Found an Openvibe signal streaming server %s (type %s, amp_serial %s) @ %s.' % (amp_name, si.type(), amp_serial, si.hostname()))
                         ch_list = pu.lsl_channel_list(inlet)
                         self._lsl_tr_channel = find_event_channel(ch_names=ch_list)
-                        channels += si.channel_count()
+                        n_channels += si.channel_count()
                         amps.append(si)
                         server_found = True
                         # OpenVibe standard unit is Volts, which is not ideal for some numerical computations
@@ -165,7 +165,7 @@ class StreamReceiver:
                         logger.info('Found an Openvibe markers server %s (type %s, amp_serial %s) @ %s.' % (amp_name, si.type(), amp_serial, si.hostname()))
                         ch_list = pu.lsl_channel_list(inlet)
                         self._lsl_tr_channel = find_event_channel(ch_names=ch_list)
-                        channels += si.channel_count()
+                        n_channels += si.channel_count()
                         amps.append(si)
                         server_found = True
                         break
@@ -173,7 +173,7 @@ class StreamReceiver:
                         logger.info('Found a streaming server %s (type %s, amp_serial %s) @ %s.' % (amp_name, si.type(), amp_serial, si.hostname()))
                         ch_list = pu.lsl_channel_list(inlet)
                         self._lsl_tr_channel = find_event_channel(ch_names=ch_list)
-                        channels += si.channel_count()
+                        n_channels += si.channel_count()
                         amps.append(si)
                         server_found = True
                         break
@@ -181,17 +181,20 @@ class StreamReceiver:
 
         self.amp_name = amp_name
 
-        # define EEG channel indices
-        self._lsl_eeg_channels = list(range(channels))
+        # EEG channel indices for StreamReceiver object
+        self._lsl_eeg_channels = list(range(n_channels))
         if self._lsl_tr_channel is None:
-            logger.warning('Trigger channel not fonud. Adding an empty channel 0.')
+            # if trigger channel is not found, add an empty trigger channel to index 0 for consistency
+            logger.warning('Trigger channel not fonud. A dummy trigger channel will be added to index 0.')
+            n_channels += 1
         else:
             if self._lsl_tr_channel != 0:
-                logger.info('Trigger channel found at index %d. Moving to index 0.' % self._lsl_tr_channel)
+                # if trigger channel is not on index 0, it will be sliced out during the acquisition
+                logger.info('Trigger channel found at index %d. Will be moved to index 0.' % self._lsl_tr_channel)
             self._lsl_eeg_channels.pop(self._lsl_tr_channel)
         self._lsl_eeg_channels = np.array(self._lsl_eeg_channels)
-        self.tr_channel = 0  # trigger channel is always set to 0.
-        self.eeg_channels = np.arange(1, channels)  # signal channels start from 1.
+        self.tr_channel = 0  # trigger channel index is now 0
+        self.eeg_channels = np.arange(1, n_channels)  # and signal channels start from index 1
 
         # create new inlets to read from the stream
         inlets_master = []
@@ -205,13 +208,11 @@ class StreamReceiver:
 
         inlets = inlets_master + inlets_slaves
         sample_rate = amps[0].nominal_srate()
-        logger.info('Channels: %d' % channels)
+        logger.info('Number of channels: %d' % n_channels)
         logger.info('LSL Protocol version: %s' % amps[0].version())
         logger.info('Source sampling rate: %.1f' % sample_rate)
         logger.info('Unit multiplier: %.1f' % self.multiplier)
 
-        #self.winsize = int(self.winsec * sample_rate)
-        #self.bufsize = int(self.bufsec * sample_rate)
         self.winsize = int(round(self.winsec * sample_rate))
         self.bufsize = int(round(self.bufsec * sample_rate))
         self.stream_bufsize = int(round(self.stream_bufsec * sample_rate))
@@ -220,10 +221,10 @@ class StreamReceiver:
         self.ch_list = ch_list
         self.inlets = inlets  # Note: not picklable!
 
-        # TODO: check if there's any problem with multiple inlets
         if len(self.inlets) > 1:
-            logger.warning('Merging of multiple acquisition servers is not supported yet. Only %s will be used.' % amps[0].name())
+            logger.warning('Merging of multiple acquisition servers is not tested yet. Only %s will be used.' % amps[0].name())
             '''
+            # TODO: check if there's any problem with multiple inlets
             for i in range(1, len(self.inlets)):
                 chunk, tslist = self.inlets[i].pull_chunk(max_samples=self.stream_bufsize)
                 self.buffers[i].extend(chunk)
@@ -302,7 +303,7 @@ class StreamReceiver:
                                    data[:, self._lsl_eeg_channels]), axis=1)
         else:
             # add an empty channel with zeros to channel 0
-            data = np.concatenate((np.zeros((data.shape[0],1)),
+            data = np.concatenate((np.zeros((data.shape[0], 1)),
                                    data[:, self._lsl_eeg_channels]), axis=1)
 
         # add data to buffer

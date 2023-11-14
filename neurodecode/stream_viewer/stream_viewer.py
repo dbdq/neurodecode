@@ -36,7 +36,10 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem
 from PyQt5 import QtCore
 from PyQt5.QtGui import QPainter
 from pathlib import Path
-from importlib.resources import files
+try:
+    from importlib.resources import files
+except ModuleNotFoundError: # for Python 3.8
+    from importlib_resources import files
 from scipy.signal import butter, lfilter, lfiltic, buttord
 from neurodecode.stream_receiver.stream_receiver import StreamReceiver
 from neurodecode import logger
@@ -374,7 +377,7 @@ class Scope(QMainWindow):
         ########## TODO: assumkng 32 samples chunk => make it read from LSL header
         data = ['EEG', srate, ['L', 'R'], 32, len(self.sr.get_eeg_channels()),
             0, self.sr.get_trigger_channel(), None, None, None, None, None]
-        logger.info('Trigger channel is %d' % self.sr.get_trigger_channel())
+        logger.info('Trigger channel: %s' % self.sr.get_trigger_channel())
 
         self.config = {'id':data[0], 'sf':data[1], 'labels':data[2],
             'samples':data[3], 'eeg_channels':data[4], 'exg_channels':data[5],
@@ -444,7 +447,7 @@ class Scope(QMainWindow):
             # data, self.ts_list= self.sr.inlets[0].pull_chunk(max_samples=self.config['sf']) # [frames][channels]
             data, self.ts_list = self.sr.acquire(blocking=False)
 
-            # TODO: check and change to these two lines
+            # TODO: check and change to these two lines if needed
             #self.sr.acquire(blocking=False, decim=DECIM)
             #data, self.ts_list = self.sr.get_window()
 
@@ -454,31 +457,20 @@ class Scope(QMainWindow):
                 return
 
             n = self.config['eeg_channels']
-            '''
-            x= np.array( data )
-            trg_ch= self.config['tri_channels']
-            if trg_ch is not None:
-                self.tri= np.reshape( x[:,trg_ch], (-1,1) ) # samples x 1
-            self.eeg= np.reshape( x[:,self.sr.eeg_channels], (-1,n) ) # samples x channels
-            '''
             trg_ch = self.config['tri_channels']
             if trg_ch is not None:
                 self.tri = np.reshape(data[:, trg_ch], (-1, 1))  # samples x 1
+                if DEBUG_TRIGGER:
+                    try:
+                        # show trigger value of a chunk
+                        trg_value = max(self.tri)
+                        if trg_value > 0:
+                            logger.info('Received trigger %s' % trg_value)
+                    except:
+                        logger.exception('Error! self.tri = %s' % self.tri)
             self.eeg = np.reshape(data[:, self.sr.eeg_channels],
                 (-1, n))  # samples x channels
 
-            if DEBUG_TRIGGER:
-                # show trigger value
-                try:
-                    trg_value = max(self.tri)
-                    if trg_value > 0:
-                        logger.info('Received trigger %s' % trg_value)
-                except:
-                    logger.exception('Error! self.tri = %s' % self.tri)
-
-                    # Read exg. self.config.samples*self.config.exg_ch, type float
-                    # bexg = np.random.rand( 1, self.config['samples'] * self.config['exg_channels'] )
-                    # self.exg = np.reshape(list(bexg), (self.config['samples'],self.config['exg_channels']))
         except WindowsError:
             # print('**** Access violation in read_eeg():\n%s\n%s'% (sys.exc_info()[0], sys.exc_info()[1]))
             pass

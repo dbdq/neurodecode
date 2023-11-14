@@ -1,6 +1,6 @@
 # Introduction
 
-Neurodecode provides a real-time brain signal decoding framework. The decoding performance was recognised at [Microsoft Brain Signal Decoding competition](https://github.com/dbdq/microsoft_decoding) with the <i>First Prize Award</i> (2016) for high decoding accuracy (2nd out of 1863 algorithms). It has been applied on a couple of online decoding projects with various electrode types including EEG, ECoG and DBS, and on several acquisition systems including AntNeuro eego, g.tec gUSBamp, BioSemi ActiveTwo, BrainProducts actiCHamp and Wearable Sensing. With modular software design, the decoding runs at approximately 15 classifications per second(cps) on a 4th-gen i7 laptop with 64-channel setup at 512 Hz sampling rate. High-speed decoding up to 200 cps was achieved using process-interleaving technique on 8 cores. It has been tested on both Linux and Windows using Python 3.7.
+Neurodecode provides a real-time brain signal decoding framework with a modular software design. The decoding performance was recognised at [Microsoft Brain Signal Decoding competition](https://github.com/dbdq/microsoft_decoding) with the <i>First Prize Award</i> (2016) for high decoding accuracy (2nd out of 1863 algorithms). It has been applied on a couple of online decoding projects with various electrode types including EEG, ECoG, DBS, and microelectrode arrays, and on several acquisition systems including AntNeuro eego, g.tec gUSBamp, BioSemi ActiveTwo, BrainProducts actiCHamp and Wearable Sensing. The decoding runs at approximately 15 classifications per second(cps) on a 4th-gen i7 laptop with 64-channel setup at 512 Hz sampling rate. High-speed decoding up to 200 cps was achieved using process-interleaving technique on 8 cores. It has been tested on both Linux and Windows using Python 3.7.
 
 The underlying data communication is based on Lab Streaming Layer (LSL) which provides sub-millisecond time synchronization accuracy. Any signal acquisition system supported by native LSL or OpenVibe is also supported by Neurodecode. Since the data communication is based on TCP, signals can be also transmitted wirelessly. For more information about LSL, please visit:
 [https://github.com/sccn/labstreaminglayer](https://github.com/sccn/labstreaminglayer)
@@ -21,7 +21,7 @@ Record signals into fif format, a standard format mainly used in [MNE EEG analys
 Replay the recorded signals in real time as if it was transmitted from a real acquisition server.
 
 ### Decoder
-This folder contains decoder and trainer modules. Currently, LDA, regularized LDA, Random Forests, and Gradient Boosting Machines are supported as the classifier type. Neural Network-based decoders are currently under experiment.
+This folder contains decoder and trainer modules. Currently, LDA, regularized LDA, Random Forests, and Gradient Boosting Machines are supported as the standard classifier type. Neural network-based decoders can be added as a customer decoder.
 
 ### Protocols
 Contains some basic protocols for training and testing. Google Glass visual feedback is supported through USB communication.
@@ -178,7 +178,7 @@ The codes are released under [GNU General Public License](https://www.gnu.org/li
 
 # Citation
 This package was developed as part of the following works:
-  - Yohann Thenaisie* and Kyuhwa Lee* <i>et al.</i>, "Principles of gait encoding in the subthalamic nucleus of people with Parkinson's disease", <i>Science Translational Medicine</i>, 2022, Vol. 14, No. 661, p. eabo1800.<br>(* first authors as equal contribution)
+  - Yohann Thenaisie* and Kyuhwa Lee* <i>et al.</i>, "Principles of gait encoding in the subthalamic nucleus of people with Parkinson's disease", <i>Science Translational Medicine</i>, 2022, Vol. 14, No. 661, p. eabo1800.<br>(* co-first authors)
   - Kyuhwa Lee <i>et al.</i>, "A Brain-Controlled Exoskeleton with Cascaded Event-Related Desynchronization Classifiers", <i>Robotics and Autonomous Systems</i>, Elsevier, 2016, p. 15-23.
    
 If some of the code here were useful or helpful for your project, I would greatly appreciate if you could cite one of the above papers.

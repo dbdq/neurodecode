@@ -68,7 +68,7 @@ pip install neurodecode
 To install the latest version, clone the repository and run setup script:
 ```
 git clone https://github.com/dbdq/neurodecode.git
-python setup.py develop
+pip install --editable .
 ```
 Add "scripts" directory to PATH environment variable for convenient access to commonly used scripts.
 
@@ -178,7 +178,7 @@ The codes are released under [GNU General Public License](https://www.gnu.org/li
 
 # Citation
 This package was developed as part of the following works:
-  - Yohann Thenaisie* and Kyuhwa Lee* <i>et al.</i>, "Principles of gait encoding in the subthalamic nucleus of people with Parkinson's disease", <i>Science Translational Medicine</i>, 2022, Vol. 14, No. 661, p. eabo1800.<br>(* co-first authors)
+  - \*Yohann Thenaisie & \*Kyuhwa Lee <i>et al.</i>, "Principles of gait encoding in the subthalamic nucleus of people with Parkinson's disease", <i>Science Translational Medicine</i>, 2022, Vol. 14, No. 661, p. eabo1800.<br>(* co-first authors)
   - Kyuhwa Lee <i>et al.</i>, "A Brain-Controlled Exoskeleton with Cascaded Event-Related Desynchronization Classifiers", <i>Robotics and Autonomous Systems</i>, Elsevier, 2016, p. 15-23.
    
 If some of the code here were useful or helpful for your project, I would greatly appreciate if you could cite one of the above papers.

@@ -60,6 +60,11 @@ OpenVibe supports a wide range of acquisition servers and all acquisition system
 
 # Installation
 
+Create a new virtual environment for Neurodecode with Python 3.7 or higher.
+```
+conda create --name nd python=3.10
+```
+
 Neurodecode can be installed from PyPI.
 ```
 pip install neurodecode

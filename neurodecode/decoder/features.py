@@ -189,11 +189,11 @@ def get_psd(epochs, psde, wlen, wstep, picks=None, flatten=True, preprocess=None
     logger.info('Feature computation took %d seconds.' % tm.sec())
 
     if flatten:
-        return X_data, y_data.astype(np.int)
+        return X_data, y_data.astype(int)
     else:
         xs = X_data.shape
         nch = len(epochs.ch_names)
-        return X_data.reshape(xs[0], xs[1], nch, int(xs[2] / nch)), y_data.astype(np.int)
+        return X_data.reshape(xs[0], xs[1], nch, int(xs[2] / nch)), y_data.astype(int)
 
 
 def get_psd_feature(epochs_train, window, psdparam, picks=None, preprocess=None, n_jobs=1):
@@ -253,7 +253,7 @@ def get_psd_feature(epochs_train, window, psdparam, picks=None, preprocess=None,
 
     psde_sfreq = sfreq / psdparam['decim']
     psde = mne.decoding.PSDEstimator(sfreq=psde_sfreq, fmin=psdparam['fmin'], fmax=psdparam['fmax'],
-        bandwidth=None, adaptive=False, low_bias=True, n_jobs=1, normalization='length', verbose='WARNING')
+        bandwidth=None, adaptive=False, low_bias=True, n_jobs=1, normalization='length')
 
     logger.info_green('PSD computation')
     if type(epochs_train) is list:

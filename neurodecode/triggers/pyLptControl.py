@@ -64,6 +64,7 @@ class Trigger(object):
         self.evefile = None
         self.lpttype = lpttype
         self.verbose = verbose
+        self.lsl_time_offset = 0
 
         if self.lpttype in ['USB2LPT', 'DESKTOP']:
             if self.lpttype == 'USB2LPT':
@@ -142,12 +143,12 @@ class Trigger(object):
                 sr = StreamReceiver(window_size=1, buffer_size=1, amp_serial=amp_serial, eeg_only=False, amp_name=amp_name)
                 local_time = pylsl.local_clock()
                 server_time = sr.get_window_list()[1][-1]
-                lsl_time_offset = server_time - local_time
+                self.lsl_time_offset = server_time - local_time
                 with open(eveoffset_file, 'a') as f:
-                    f.write('Offset: %.6f\n' % lsl_time_offset)
+                    f.write('Offset: %.6f\n' % self.lsl_time_offset)
                     f.write('Server time: %.6f\n' % server_time)
                     f.write('Local time: %.6f\n' % local_time)
-                logger.info('LSL timestamp offset (%.3f) saved to %s' % (lsl_time_offset, eveoffset_file))
+                logger.info('LSL timestamp offset (%.3f) saved to %s' % (self.lsl_time_offset, eveoffset_file))
 
         elif self.lpttype == 'MOCK' or self.lpttype is None or self.lpttype is False:
             logger.warning('Using a fake trigger.')
@@ -184,7 +185,8 @@ class Trigger(object):
     # write to software trigger
     def write_event(self, value):
         assert self.lpttype == 'SOFTWARE'
-        self.evefile.write('%.6f\t0\t%d\n' % (pylsl.local_clock(), value))
+        t_server = pylsl.local_clock() + self.lsl_time_offset
+        self.evefile.write('%.6f\t0\t%d\n' % (t_server, value))
         return True
 
     # set data

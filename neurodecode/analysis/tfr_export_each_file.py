@@ -10,7 +10,6 @@ Kyuhwa Lee, 2018
 
 import sys
 import os
-import imp
 import mne
 import scipy
 import numpy as np

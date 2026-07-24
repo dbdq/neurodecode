@@ -11,7 +11,6 @@ EPFL, 2019
 import sys
 import os
 import mne
-import imp
 import pdb
 import scipy
 import traceback

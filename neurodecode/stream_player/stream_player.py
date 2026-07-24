@@ -21,7 +21,7 @@ from neurodecode.triggers.trigger_def import trigger_def
 from neurodecode import logger
 from builtins import input
 
-def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_start=True, repeat=float('inf'), high_resolution=False, trigger_file=None):
+def stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_start=False, repeat=float('inf'), high_resolution=False, trigger_file=None):
     """
     Input
     =====
@@ -152,7 +152,7 @@ def sample_code():
     server_name = 'StreamPlayer'
     chunk_size = 8
     fif_file = '../../mi_left_right.fif'
-    stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_start=False)
+    stream_player(server_name, fif_file, chunk_size, auto_restart=True, wait_start=True)
 
 # sample code
 if __name__ == '__main__':

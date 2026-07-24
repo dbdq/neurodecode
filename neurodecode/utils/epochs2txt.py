@@ -26,7 +26,6 @@ import neurodecode.utils.q_common as qc
 import scipy.io
 import mne
 import numpy as np
-import trainer
 from multiprocessing import cpu_count
 from neurodecode import logger
 

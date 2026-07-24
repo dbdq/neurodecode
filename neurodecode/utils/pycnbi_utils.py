@@ -18,7 +18,7 @@ import sys
 import mne
 import pylsl
 import scipy.io
-import importlib
+import importlib.util
 import numpy as np
 import multiprocessing as mp
 import xml.etree.ElementTree as ET

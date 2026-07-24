@@ -235,7 +235,7 @@ def eeg2fif(filename, interactive=False, outdir=None):
     nch, t_len = signals.shape
     ch_names = ['TRIGGER'] + ['CH%d' % (x + 1) for x in range(nch)]
     ch_info = ['stim'] + ['eeg'] * (nch)
-    info = mne.create_info(ch_names, sample_rate, ch_info, montage='standard_1005')
+    info = mne.create_info(ch_names, sample_rate, ch_info)
 
     # add event channel
     eventch = np.zeros([1, signals.shape[1]])
@@ -243,6 +243,7 @@ def eeg2fif(filename, interactive=False, outdir=None):
 
     # create Raw object
     raw = mne.io.RawArray(signals, info)
+    raw.set_montage('standard_1005', on_missing='ignore')
 
     # add events
     raw.add_events(events, 'TRIGGER')
@@ -417,10 +418,11 @@ def bdf2fif_matlab(filename, interactive=False, outdir=None):
     signals = np.concatenate((signals_raw[-1, :].reshape(1, -1), signals_raw[:-1, :]))
     signals[0] *= 0  # init the event channel
 
-    info = mne.create_info(ch_names, sample_rate, ch_info, montage='standard_1005')
+    info = mne.create_info(ch_names, sample_rate, ch_info)
 
     # create Raw object
     raw = mne.io.RawArray(signals, info)
+    raw.set_montage('standard_1005', on_missing='ignore')
 
     # add events
     raw.add_events(events, 'TRIGGER')

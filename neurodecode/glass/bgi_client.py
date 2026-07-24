@@ -80,10 +80,7 @@ class GlassControl(object):
         self.socket.close()
 
     def send_byte(self, msg):
-        if sys.version_info.major >= 3:
-            self.socket.sendall(bytes(msg + '\n', "UTF-8"))
-        else:
-            self.socket.sendall(bytes(unicode(msg + '\n')))
+        self.socket.sendall(bytes(msg + '\n', "UTF-8"))
 
     def send_msg(self, msg, wait=True):
         """

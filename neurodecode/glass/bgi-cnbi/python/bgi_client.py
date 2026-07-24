@@ -27,9 +27,8 @@ class GlassControl():
         self.s.close()
 
     def send_msg(self, msg):
-        # self.s.sendall(bytes(msg, "UTF-8")) # for Python3
         try:
-            self.s.sendall(bytes(unicode(msg)))
+            self.s.sendall(bytes(msg, "UTF-8"))
         except:
             print('>> ERROR: Glass communication failed! Re-initiating the connection.')
             self.disconnect()
